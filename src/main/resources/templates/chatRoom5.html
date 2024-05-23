@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Chat Room</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            padding-top: 75px;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .leads-con {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .h1 {
+            color: red;
+            font-size: 40px;
+            margin: 0;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .user-list {
+            width: 200px;
+            float: left;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        .user {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .user:hover {
+            color: #f0f0f0; 
+        }
+        .conversation-container {
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            height: 400px;
+        }
+        .message-input {
+            width: calc(100% - 20px);
+            margin: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .send-button {
+            width: calc(100% - 20px);
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #008000;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .message {
+            padding: 5px;
+            margin: 5px;
+            border-radius: 3px;
+            background-color: #e0e0e0;
+            clear: both;
+        }
+        .message-left {
+            float: left;
+            background-color: #b2ebf2;
+        }
+        .message-right {
+            float: right;
+            background-color: #e0e0e0; 
+        }
+        .logo {
+            float: left;
+            padding: 0 20px;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            text-decoration: underline;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px; 
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        #backToDashboardButton {
+            margin-top: 20px;
+        }
+        #backToDashboardButton button {
+            background-color:rgb(205, 50, 107) ;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #backToDashboardButton button:hover {
+            background: rgb(205, 50, 107);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <p>Saranya Jash Corporation</p>
+            </div>
+            <ul>
+                <li><button class="logout-button" id="logoutButton">Logout</button></li>
+            </ul>
+        </nav>
+        <div class="leads-con">
+            <h1 class="h1">Chat Room</h1>
+            <div class="chat-container">
+                <div class="user-list" id="userList">
+                    <div th:each="user : ${users}">
+                        <a href="#" class="user" th:text="${user.username}" th:attr="data-username=${user.username}" onclick="loadConversation(this)"></a>
+                    </div>
+                </div>
+                <div class="conversation-container">
+                    <div id="selectedUser"></div>
+                    <div id="conversationContainer">
+                        <div th:each="message : ${messages}" th:class="${message.sender == loggedInUsername} ? 'message message-right' : 'message message-left'">
+                            <div th:text="${message.sender + ': ' + message.content}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <input type="text" id="messageInput" class="message-input" placeholder="Type your message...">
+                    <button onclick="sendMessage()" class="send-button">Send</button>
+                </div>
+            </div>
+            <div id="backToDashboardButton">
+                <a href="/figures"><button>Back To Dashboard</button></a>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var loggedInUsername = /*[[@{${loggedInUsername}}]]*/ 'defaultUsername';
+        var selectedUsername = '';
+        function loadConversation(element) {
+            selectedUsername = element.getAttribute('data-username');
+            var selectedUserElement = document.getElementById('selectedUser');
+            if (selectedUserElement) {
+                selectedUserElement.innerText = 'Chatting with: ' + selectedUsername;
+                $.get('/loadConversation/' + loggedInUsername + '/' + selectedUsername, function (messages) {
+                    $('#conversationContainer').empty();
+                    if (messages.length > 0) {
+                        console.log('Received messages:', messages);
+                        messages.forEach(function (message) {
+                            var messageElement = $('<div class="message">').text(message.sender + ': ' + message.content);
+                            $('#conversationContainer').append(messageElement);
+                        });
+                    } else {
+                        console.log('No messages found.');
+                    }
+                });
+            } else {
+                console.error('Element with id "selectedUser" not found.');
+            }
+        }
+        function sendMessage() {
+            var messageContent = $('#messageInput').val();
+            if (!selectedUsername) {
+                console.error('No user selected for sending messages.');
+                return;
+            }
+            var message = {
+                sender: loggedInUsername,
+                receiver: selectedUsername,
+                content: messageContent
+            };
+            console.log('Sending message:', message);
+            $.ajax({
+                type: 'POST',
+                url: '/sendMessage',
+                contentType: 'application/json',
+                data: JSON.stringify(message),
+                success: function () {
+                    console.log('Message sent successfully');
+                    $('#messageInput').val('');
+                    var messageElement = $('<div class="message">').text(message.sender + ': ' + message.content);
+                    $('#conversationContainer').append(messageElement);
+                },
+                error: function (error) {
+                    console.error('Error sending message:', error);
+                    console.error('Server response:', error.responseText);
+                }
+            });
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

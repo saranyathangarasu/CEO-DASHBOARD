@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>salesDashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+            color: rgb(255, 255, 255);
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+        .menu-toggle i {
+            font-size: 24px;
+            color: rgb(255, 255, 255);
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0; 
+            position: fixed;
+            z-index: 1;
+            top: 75px;
+            left: 0;
+            background-color: #0056b3;
+            padding-top: 20px;
+            transition: width 0.3s ease; 
+            overflow: hidden; 
+        }
+
+        .sidenav.active {
+            width: 250px; 
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #c5c509;
+        }
+
+        .logout-button-sidenav {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .logout-button-sidenav:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center; 
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .leads-con {
+            margin-top: 80px;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        .leads-con, button-con {
+            position: relative;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #netProfitMarginChart {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: rgb(205, 50, 107);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: rgb(205, 50, 107);
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .fa-solid.fa-bars {
+            font-size: 24px;
+            color: rgb(255, 255, 255);
+            margin-right: 30px;
+            margin-left: 30px;
+        }
+        @media only screen and (max-width: 768px) {
+            .sidenav {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease; 
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .menu-toggle.active {
+                color: red; 
+            }
+
+            .sidenav.active {
+                width: 250px; 
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-con">
+	<nav>
+            <div class="logo">
+                <i class="fa-solid fa-bars menu-toggle"></i> 
+                <p>Sales and Marketing Dashboard</p>
+            </div>
+        </nav>
+        <div class="sidenav">           
+            <a href="/financeOverview">Finance Overview</a>
+            <a href="/salesUpdate">Add Contact List</a>
+            <a href="/figures">View Sales Figures</a>
+            <a href="/ratesDashboard">View Customer Acquisition Rates</a>
+            <a href="/conversionDashboard">View Conversation Rates</a>
+            <a href="/profile">View Profile</a>
+            <a href="/chatRoom2">chat Room</a>
+            <button class="logout-button-sidenav" id="logoutButton">Logout</button>
+        </div>
+    <div class="leads-con">
+        <h1 class="h1">Leads</h1>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="salesData : ${salesDataList}">
+                    <td th:text="${salesData.name}"></td>
+                    <td th:text="${salesData.email}"></td>
+                    <td th:text="${salesData.phone}"></td>
+                    <td th:text="${salesData.company}"></td>
+                    <td th:text="${salesData.status}"></td>
+                    <td>
+                        <form style="display: inline-block;" method="get" th:action="@{'/salesEdit/' + ${salesData.id}}">
+                        <button class="edit-button" style="background-color: #008000;" type="submit">Edit</button>
+                        </form>
+                        <form style="display: inline-block;" id="deleteForm" method="post" th:action="@{/deleteSalesData}">
+                            <input type="hidden" name="id" th:value="${salesData.id}" />
+                            <button class="delete-button" type="button" onclick="confirmDelete()">Delete</button>
+                        </form>
+                     </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <th:block th:if="${#authorization.expression('hasAuthority(''HO_Company'')')}">
+            <div id="backToDashboardButton">
+                <a th:href="@{/home}">
+                    <button>Back To Dashboard</button>
+                </a>
+            </div>
+        </th:block>
+    </div>
+</div>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuToggle = document.querySelector(".menu-toggle");
+            const sideNav = document.querySelector(".sidenav");
+
+            menuToggle.addEventListener("click", function () {
+                sideNav.classList.toggle("active");
+                menuToggle.classList.toggle("active");
+            });
+
+        });
+    </script>
+<script>
+
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete this record?")) {
+            document.getElementById("deleteForm").submit();
+        }
+    }
+    document.getElementById("logoutButton").addEventListener("click", function () {
+        window.location.href = "/login";
+    });
+
+    document.querySelectorAll('.button1').forEach(button => {
+        button.addEventListener('click', function (event) {
+            var form = event.target.closest('form');
+            var salesId = form.getAttribute('data-id'); 
+            var dropdown = form.querySelector('.status-update-dropdown');
+            var selectedStatus = dropdown.value;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>operationalUpdate</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .form-input input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <p>Oprational Metrics</p>
+            </div>
+            <div>
+                <ul>
+                    <li>
+                        <button class="cancel-button" type="submit" id="cancelButton">Cancel</button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="form-container">
+            <div class="form">
+                <h1>Operational Update</h1>
+                <form th:action="@{/operationalUpdateSave}" th:object="${operationalData}" method="post" id="updateForm">
+                    <div class="form-input">
+                        <label for="date">Date:</label>
+                        <input th:field="*{date}" type="date" id="date" name="date" th:value="${financeData != null ? #dates.format(financeData.date, 'yyyy-MM-dd') : ''}" required>
+                        <span id="dateError" class="error-message">Please select a valid date.</span>
+                        <span id="dateRequiredError" class="error-message">Please Enter a Date.</span>
+                    </div>
+					<div class="form-input">
+   						<label for="status">Metric Name:</label>
+    					<select th:field="*{name}" id="status" name="name">
+        					<option value="" selected></option>
+        					<option value="Production Output">Production Output</option>
+       		 				<option value="Efficiency">Efficiency</option>
+        					<option value="Inventory Level">Inventory Level</option>
+        					<option value="Supply Chain Performance">Supply Chain Performance</option>
+    					</select>
+    					<span id="nameError" class="error-message">Please select a metric name.</span>
+    					<span id="nameRequiredError" class="error-message">Please choose a metric name.</span>
+					</div>
+                    <div class="form-input">
+                        <label for="value">Value:</label>
+                        <input th:field="*{value}" type="number" id="value" name="value" step="0.01" th:value="${operationalData.value != null ? operationalData.value : ''}" required>
+                        <span id="valueError" class="error-message">Please provide a non-negative number.</span>
+                        <span id="valueRequiredError" class="error-message">Please Enter a Value.</span>
+                    </div>
+                    <div class="center-button">
+                        <button class="update-button" type="button" id="updateButton">Add Inventory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.getElementById("cancelButton").addEventListener("click", function () {
+        window.location.href = "/operationalDashboard";
+    });
+
+    document.getElementById("updateButton").addEventListener("click", function () {
+        validateForm();
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        var dateInput = document.getElementById("date");
+        dateInput.max = new Date().toISOString().split("T")[0];
+        dateInput.addEventListener("input", function () {
+            var selectedDate = new Date(dateInput.value);
+            var currentDate = new Date();
+            if (selectedDate > currentDate) {
+                alert("Date cannot be in the future. Please select a valid date.");
+                dateInput.value = currentDate.toISOString().split("T")[0];
+            }
+        });
+    });
+    function validateForm() {
+            var dateInput = document.getElementById("date");
+            var nameInput = document.getElementById("status");
+            var valueInput = document.getElementById("value");
+            var dateError = document.getElementById("dateError");
+            var nameError = document.getElementById("nameError");
+            var valueError = document.getElementById("valueError");
+            var dateRequiredError = document.getElementById("dateRequiredError");
+            var nameRequiredError = document.getElementById("nameRequiredError");
+            var valueRequiredError = document.getElementById("valueRequiredError");
+            var isValid = true;
+            dateError.style.display = "none";
+            nameError.style.display = "none";
+            valueError.style.display = "none";
+            dateRequiredError.style.display = "none";
+            nameRequiredError.style.display = "none";
+            valueRequiredError.style.display = "none";
+            var currentDate = new Date();
+            var selectedDate = new Date(dateInput.value);
+            if (selectedDate > currentDate) {
+                dateError.style.display = "block";
+                isValid = false;
+            }
+            if (nameInput.value === "") {
+                nameError.style.display = "block";
+                isValid = false;
+            }
+            if (!valueInput.value) {
+                valueRequiredError.style.display = "block";
+                isValid = false;
+            } else if (parseFloat(valueInput.value) < 0) {
+                valueError.style.display = "block";
+                valueError.textContent = "Please provide a non-negative number.";
+                isValid = false;
+            }
+            if (!dateInput.value) {
+                dateRequiredError.style.display = "block";
+                isValid = false;
+            }
+            if (isValid) {
+                document.getElementById("updateForm").submit();
+            }
+        }
+    document.addEventListener("DOMContentLoaded", function () {
+            const dateInput = document.getElementById('date');
+            const dateError = document.getElementById('dateError');
+            dateInput.addEventListener('blur', () => {
+                validateInput(dateInput, dateError, 'Please select a date.');
+            });
+
+            const statusSelect = document.getElementById('status');
+            const nameError = document.getElementById('nameError');
+            statusSelect.addEventListener('blur', () => {
+                validateSelect(statusSelect, nameError, 'Please select a metric name.');
+            });
+
+            const valueInput = document.getElementById('value');
+            const valueError = document.getElementById('valueError');
+            valueInput.addEventListener('blur', () => {
+                validateInput(valueInput, valueError, 'Please enter a value.');
+            });
+
+            function validateInput(inputElement, errorElement, errorMessage) {
+                if (inputElement.value.trim() === "") {
+                    showError(errorElement, errorMessage);
+                } else {
+                    hideError(errorElement);
+                }
+            }
+
+            function validateSelect(selectElement, errorElement, errorMessage) {
+                if (selectElement.value.trim() === "") {
+                    showError(errorElement, errorMessage);
+                } else {
+                    hideError(errorElement);
+                }
+            }
+
+            function showError(element, errorMessage) {
+                element.textContent = errorMessage;
+                element.style.color = "red";
+                element.style.display = "block";
+            }
+
+            function hideError(element) {
+                element.textContent = "";
+                element.style.display = "none";
+            }
+        });
+</script>
+</body>
+</html>

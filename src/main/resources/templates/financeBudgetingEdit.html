@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <title>financeBudgetingEdit</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            margin-top: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .form {
+            margin-top: 40px;
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .rates-con {
+            padding-top: 10px;
+            margin-top: -20px;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #033747;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #ratesChart {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        td[data-type="percentage"]::after {
+            content: '%';
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <p>Finance Budgeting Dashboard</p>
+            </div>
+            <div class="button-con">
+                <ul>
+                    <li><button class="logout-button" id="logoutButton">Cancel</button></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="leads-con">
+            <div class="form-container">
+                <div class="form">
+                    <h1>Budgeting Update</h1>
+                   <form action="/budgetingAdd" method="post" th:object="${budgeting}">
+                    <input type="hidden" th:field="*{id}" id="id" name="id" />
+                    <div class="form-input">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" th:value="${#temporals.format(budgeting.date, 'yyyy-MM-dd')}" name="date" />
+                        <span class="error-message" id="dateError"></span>
+                    </div>
+                    <div class="form-input">
+                        <label for="category">Category:</label>
+                        <select th:field="*{category}" id="category" name="category">
+                        </select>
+                        <span class="error-message" id="categoryError"></span>
+                    </div>
+                    <div class="form-input">
+                        <label for="plannedAmount">Planned Amount:</label>
+                        <input th:field="*{plannedAmount}" type="number" id="plannedAmount" name="plannedAmount">
+                        <span class="error-message" id="plannedAmountError"></span>
+                    </div>
+                    <div class="form-input">
+                        <label for="actualAmount">Actual Amount:</label>
+                        <input th:field="*{actualAmount}" type="number" id="actualAmount" name="actualAmount">
+                        <span class="error-message" id="actualAmountError"></span>
+                    </div>
+                    <div class="center-button">
+                        <button id="addDataButton" class="update-button" type="submit">Update Data</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('max', today);
+            }
+
+            document.getElementById("logoutButton").addEventListener("click", function () {
+                window.location.href = "/financeBudgeting";
+            });
+
+            // Fetch categories and populate the dropdown
+            try {
+                const response = await fetch('/api/categories');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const categories = await response.json();
+                const categoryDropdown = document.getElementById('category');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.text = category.category;
+                    categoryDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+
+            // Form submission validation
+            const form = document.querySelector('form');
+            const categoryInput = document.getElementById('category');
+            const plannedAmountInput = document.getElementById('plannedAmount');
+            const actualAmountInput = document.getElementById('actualAmount');
+
+            if (form && dateInput && categoryInput && plannedAmountInput && actualAmountInput) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    if (!validateForm()) {
+                        return false;
+                    }
+                    form.submit();
+                });
+            }
+
+            function validateForm() {
+                let isValid = true;
+                const dateValue = dateInput.value.trim();
+                const categoryValue = categoryInput.value.trim();
+                const plannedAmountValue = plannedAmountInput.value.trim();
+                const actualAmountValue = actualAmountInput.value.trim();
+
+                if (dateValue === '') {
+                    showError('Please enter a date', 'dateError');
+                    isValid = false;
+                } else {
+                    removeError('dateError');
+                }
+
+                if (categoryValue === '') {
+                    showError('Please select a category', 'categoryError');
+                    isValid = false;
+                } else {
+                    removeError('categoryError');
+                }
+
+                if (plannedAmountValue === '') {
+                    showError('Please enter a planned amount', 'plannedAmountError');
+                    isValid = false;
+                } else if (isNaN(plannedAmountValue) || +plannedAmountValue < 0) {
+                    showError('Planned amount must be a positive number', 'plannedAmountError');
+                    isValid = false;
+                } else {
+                    removeError('plannedAmountError');
+                }
+
+                if (actualAmountValue === '') {
+                    showError('Please enter an actual amount', 'actualAmountError');
+                    isValid = false;
+                } else if (isNaN(actualAmountValue) || +actualAmountValue < 0) {
+                    showError('Actual amount must be a positive number', 'actualAmountError');
+                    isValid = false;
+                } else {
+                    removeError('actualAmountError');
+                }
+
+                return isValid;
+            }
+
+            function showError(message, errorElementId) {
+                const errorElement = document.getElementById(errorElementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+
+            function removeError(errorElementId) {
+                const errorElement = document.getElementById(errorElementId);
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            }
+        });
+    </script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector('form');
+            const dateInput = document.getElementById('date');
+            const categoryInput = document.getElementById('category');
+            const plannedAmountInput = document.getElementById('plannedAmount');
+            const actualAmountInput = document.getElementById('actualAmount');
+
+            if (form && dateInput && categoryInput && plannedAmountInput && actualAmountInput) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    if (!validateForm()) {
+                        return false;
+                    }
+                    form.submit();
+                });
+            }
+
+            function validateForm() {
+                let isValid = true;
+                const dateValue = dateInput.value.trim();
+                const categoryValue = categoryInput.value.trim();
+                const plannedAmountValue = plannedAmountInput.value.trim();
+                const actualAmountValue = actualAmountInput.value.trim();
+
+                isValid = validateInput(dateValue, 'dateError', 'Please enter a date') && isValid;
+                isValid = validateSelect(categoryValue, 'categoryError', 'Please select a category') && isValid;
+                isValid = validateInput(plannedAmountValue, 'plannedAmountError', 'Please enter a planned amount') && isValid;
+                isValid = validateInput(actualAmountValue, 'actualAmountError', 'Please enter an actual amount') && isValid;
+
+                return isValid;
+            }
+
+            function validateInput(value, errorElementId, errorMessage) {
+                const errorElement = document.getElementById(errorElementId);
+                if (!value) {
+                    showError(errorElement, errorMessage);
+                    return false;
+                } else {
+                    hideError(errorElement);
+                    return true;
+                }
+            }
+
+            function validateSelect(value, errorElementId, errorMessage) {
+                const errorElement = document.getElementById(errorElementId);
+                if (!value) {
+                    showError(errorElement, errorMessage);
+                    return false;
+                } else {
+                    hideError(errorElement);
+                    return true;
+                }
+            }
+
+            function showError(element, errorMessage) {
+                element.textContent = errorMessage;
+                element.style.color = "red";
+                element.style.display = "block";
+            }
+
+            function hideError(element) {
+                element.textContent = "";
+                element.style.display = "none";
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById('date');
+    const dateError = document.getElementById('dateError');
+    dateInput.addEventListener('blur', () => {
+        validateInput(dateInput, dateError, 'Please select a date.');
+    });
+
+    const categoryInput = document.getElementById('category');
+    const categoryError = document.getElementById('categoryError');
+    categoryInput.addEventListener('blur', () => {
+        validateSelect(categoryInput, categoryError, 'Please select a category.');
+    });
+
+    const plannedAmountInput = document.getElementById('plannedAmount');
+    const plannedAmountError = document.getElementById('plannedAmountError');
+    plannedAmountInput.addEventListener('blur', () => {
+        validateInput(plannedAmountInput, plannedAmountError, 'Please enter the planned amount.');
+    });
+
+    const actualAmountInput = document.getElementById('actualAmount');
+    const actualAmountError = document.getElementById('actualAmountError');
+    actualAmountInput.addEventListener('blur', () => {
+        validateInput(actualAmountInput, actualAmountError, 'Please enter the actual amount.');
+    });
+
+    function validateInput(inputElement, errorElement, errorMessage) {
+        if (inputElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function validateSelect(selectElement, errorElement, errorMessage) {
+        if (selectElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function showError(element, errorMessage) {
+        element.textContent = errorMessage;
+        element.style.color = "red";
+        element.style.display = "block";
+    }
+
+    function hideError(element) {
+        element.textContent = "";
+        element.style.display = "none";
+    }
+});
+    </script>
+</body>
+</html>

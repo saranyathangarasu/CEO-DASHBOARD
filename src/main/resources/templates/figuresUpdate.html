@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>figuresUpdate</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+             background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .form-input input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>Sales Figures Dashboard</p>
+        </div>
+        <ul>
+            <li>
+                <button class="cancel-button" id="cancelButton"><a href="/figures">Cancel</a></button>
+            </li>
+        </ul>
+    </nav>
+    <div class="form-container">
+        <div class="form">
+            <h1>Sales Figures Update</h1>
+            <form method="post" th:action="@{/figuresUpdateSave}" th:object="${figuresDataDto}" onsubmit="return validateForm()">
+    <div class="form-input">
+    <label for="date">Date:</label>
+    <input th:field="*{date}" type="date" id="date" name="date">
+    <span class="error-message" id="dateError"></span>
+</div>
+<div class="form-input">
+    <label for="productName">Product Name:</label>
+    <select th:field="*{productName}" id="productName" name="productName">
+    </select>
+    <span class="error-message" id="productNameError"></span>
+</div>
+<div class="form-input">
+    <label for="quantitySold">Quantity Sold:</label>
+    <input th:field="*{quantitySold}" type="number" id="quantitySold" name="quantitySold">
+    <span class="error-message" id="quantitySoldError"></span>
+</div>
+<div class="center-button">
+    <button class="update-button" id="updateButton" type="submit">Add Data</button>
+</div>
+</form>
+        </div>
+    </div>
+    <script>
+    window.onload = function() {
+    fetch('/api/productNames') 
+        .then(response => response.json())
+        .then(data => {
+            const productNameSelect = document.getElementById('productName');
+            productNameSelect.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Select a Product';
+            productNameSelect.appendChild(defaultOption);
+            data.forEach(productName => {
+                const option = document.createElement('option');
+                option.value = productName;
+                option.text = productName;
+                productNameSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching product names:', error));
+};
+function calculateRevenue() {
+    const productNameSelect = document.getElementById('productName');
+    const selectedProductName = productNameSelect.value;
+    const quantitySoldInput = document.getElementById('quantitySold');
+    fetch(`/api/productPrice?productName=${selectedProductName}`)
+        .then(response => response.json())
+        .then(data => {
+            const price = data.price;
+            const quantitySold = parseInt(quantitySoldInput.value);
+            const totalRevenue = quantitySold * price;
+            const totalRevenueElement = document.getElementById('totalRevenue');
+            totalRevenueElement.textContent = 'Total Revenue: $' + totalRevenue.toFixed(2);
+        })
+        .catch(error => console.error('Error fetching product price:', error));
+}
+    function displayError(errorId, errorMessage) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = errorMessage;
+        errorElement.style.color = "red";
+        errorElement.style.display = "block";
+    }
+    function hideError(errorId) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = "";
+        errorElement.style.display = "none";
+    }
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').setAttribute('max', today);
+    function validateForm() {
+        var isValid = true;
+        var dateInput = document.getElementById("date");
+        if (!dateInput.value) {
+            displayError("dateError", "Please select a date.");
+            isValid = false;
+        } else {
+            hideError("dateError");
+        }
+        var productNameSelect = document.getElementById("productName");
+        if (!productNameSelect.value) {
+            displayError("productNameError", "Please select a product name.");
+            isValid = false;
+        } else {
+            hideError("productNameError");
+        }
+        var quantitySoldInput = document.getElementById("quantitySold");
+        if (!quantitySoldInput.value) {
+            displayError("quantitySoldError", "Please enter the quantity sold.");
+            isValid = false;
+        } else if (parseInt(quantitySoldInput.value) <= 0) {
+            displayError("quantitySoldError", "Quantity sold must be positive number.");
+            isValid = false;
+        } else {
+            hideError("quantitySoldError");
+        }
+        return isValid;
+    }
+    function displayError(errorId, errorMessage) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = errorMessage;
+        errorElement.style.color = "red";
+        errorElement.style.display = "block";
+    }
+    function hideError(errorId) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = "";
+        errorElement.style.display = "none";
+    }
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').setAttribute('max', today);
+    document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById('date');
+    const dateError = document.getElementById('dateError');
+    dateInput.addEventListener('blur', () => {
+        validateInput(dateInput, dateError, 'Please select a date.');
+    });
+
+    const productNameSelect = document.getElementById('productName');
+    const productNameError = document.getElementById('productNameError');
+    productNameSelect.addEventListener('blur', () => {
+        validateSelect(productNameSelect, productNameError, 'Please select a product name.');
+    });
+
+    const quantitySoldInput = document.getElementById('quantitySold');
+    const quantitySoldError = document.getElementById('quantitySoldError');
+    quantitySoldInput.addEventListener('blur', () => {
+        validateInput(quantitySoldInput, quantitySoldError, 'Please enter the quantity sold.');
+    });
+
+    function validateInput(inputElement, errorElement, errorMessage) {
+        if (inputElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function validateSelect(selectElement, errorElement, errorMessage) {
+        if (selectElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function showError(element, errorMessage) {
+        element.textContent = errorMessage;
+        element.style.color = "red";
+        element.style.display = "block";
+    }
+
+    function hideError(element) {
+        element.textContent = "";
+        element.style.display = "none";
+    }
+});
+</script>
+</body>
+</html>

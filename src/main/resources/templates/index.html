@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {          
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+            font-family: Arial, sans-serif;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            padding: 0 100px;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            background-color: #007bff;
+        }
+        nav .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            float: left;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+        }
+        nav ul {
+            float: right;
+            width: 20%;
+            display: flex;
+            justify-content: space-around;
+        }
+        nav li {
+            display: inline-block;
+            list-style: none;
+        }
+        button {
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+        }
+        button a {
+            color: white;
+            text-decoration: none;
+        }
+        .hero-section {
+            background-color: rgba(238, 235, 235, 0.8);
+            padding: 100px 0;
+            text-align: center;
+        }
+        .hero-section h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .hero-section p {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color:#008000;
+            color: white;
+            border-radius: 5px;
+            font-size: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .cta-button:hover {
+            background-color: #008000;
+        }
+        .company-details {
+            background-color: rgba(255, 255, 255, 0.8); 
+            padding: 50px 0;
+            text-align: center;
+            flex-grow: 1; 
+        }
+        .company-details h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .company-details p {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .company-details img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px; 
+        }
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 0.5px 0;
+    margin-top: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .footer-left p,
+        .footer-right p,
+        .footer-center p {
+            margin: 5px 0;
+        }     
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>SARANYA JASH CORPORATION</p>
+        </div>
+        <ul>
+            <li><button id="signUpButton"><a href="/register">SIGN UP</a></button></li>
+            <li><button id="loginButton"><a href="/login">SIGN IN</a></button></li>
+        </ul>
+    </nav>
+    <section class="hero-section">
+        <h1>Welcome to Saranya Jash Corporation</h1>
+        <p>Gain actionable insights and make informed decisions.</p>
+        <button><a class="cta-button" id="cta-button">Get Started</a></button>
+    </section>
+    <section class="company-details" style="background-color: rgb(226, 234, 237);">
+        <h2>About Saranya Jash Corporation</h2>
+        <p>Saranya Jash Corporation is a leading technology company that specializes in providing innovative solutions for businesses worldwide. Our mission is to empower CEOs and decision-makers with real-time data and analytics to drive success and growth.</p>     
+    </section>
+    <footer>
+        <div class="footer-center">
+            <p>&copy; 2024 Saranya Jash Corporation. All rights reserved.</p>
+        </div>
+        <div class="footer-content">
+            <div class="footer-left">
+                <p>Saranya Jash Corportation,</p>
+                <p>Cross cut Road.</p>
+                <p>Gandhipuram,</p>
+                <p>Coimbatore-637421.</p>
+            </div>
+            <div class="footer-right">
+                <p>Contact: +91 6382840491</p>
+                <p>Email: saranyajash2003@gmail.com</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.getElementById("signUpButton").addEventListener("click", function() {
+            window.location.href = "/register";
+        });
+        document.getElementById("loginButton").addEventListener("click", function() {
+            window.location.href = "/login"; 
+        });
+        document.getElementById("cta-button").addEventListener("click", function() {
+            window.location.href = "/login"; 
+        });
+    </script>
+</body>
+</html>

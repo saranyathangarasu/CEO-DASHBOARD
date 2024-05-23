@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Category</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background: linear-gradient(#033747, #012733);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            margin-top: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .form {
+            margin-top: 40px;
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .rates-con {
+            padding-top: 10px;
+            margin-top: -20px;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #033747;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #ratesChart {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        td[data-type="percentage"]::after {
+            content: '%';
+        }
+        .profile-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            left:30px; 
+        }
+        .text-icon-circle {
+            width: 35px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            left: 60px; 
+        }
+        .text-icon-circle img {
+            position: absolute;
+            bottom: 0px; 
+            max-width: 25px;
+            max-height: 25px;
+            border-radius: 50%;
+            right: 5px;
+        }
+        .profile-circle img {
+            position: absolute; 
+            bottom: 0px; 
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 50%;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+			<div class="profile-circle">
+    <a href="/profile"><img src="/profile.png" alt="Profile Icon"></a>
+</div>
+<div class="text-icon-circle">
+    <a href="/chatRoom8"><img src="/text.png" alt="Text Icon"></a>
+</div>
+            <div class="logo">
+                <p>Category</p>
+            </div>
+            <div class="button">
+                <ul>
+                    <li><button class="logout-button" id="cancelButton">Cancel</button></li>
+                </ul>
+            </div>
+        </nav>
+<div class="form-container">
+        <div class="form">
+            <h1>Category Add</h1>
+            <form id="categoryForm" method="post" th:action="@{/categoryUpdate}" th:object="${categoryDto}">
+                <div class="form-input">
+                    <label for="category">Category:</label>
+                    <input th:field="*{category}" type="text" id="category" name="category">
+                    <span id="categoryError" class="error-message"></span>
+                </div>
+                <div class="center-button">
+                    <button class="update-button" id="updateButton" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+       <div class="rates-con">
+        <h1 class="h1">Category Data</h1>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="category : ${categoryList}">
+                        <td th:text="${category.category}"></td>
+                        <td>
+                        <a th:href="@{'/categoryEdit/' + ${category.id}}">
+                            <button>Edit</button>
+                        </a>
+<button class="delete-button" th:onclick="'deleteCategory(' + ${category.id} + ');'">Delete</button>
+        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:if="${#authorization.expression('hasAnyAuthority(''HO_Company'',''Financehead'',''Budgetinghead'')')}">
+        <div id="backToDashboardButton">
+            <a th:href="@{/financeBudgeting}">
+                <button>Back To Dashboard</button>
+            </a>
+        </div>
+    </div>
+    <script>
+		document.getElementById("cancelButton").addEventListener("click", function() {
+            window.location.href = "/financeBudgeting";
+        });
+    function deleteCategory(id) {
+        if (isNaN(id)) {
+            console.error('Invalid id:', id);
+            alert("Invalid ID. Please try again.");
+            return;
+        }
+        id = parseInt(id);
+
+        if (confirm("Are you sure you want to delete this category?")) {
+            fetch(`/categoryDelete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Category deleted successfully");
+                    window.location.reload(); 
+                } else {
+                    throw new Error('Failed to delete category');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Failed to delete category");
+            });
+        }
+    }
+    document.getElementById("categoryForm").addEventListener("submit", function (event) {
+            var categoryInput = document.getElementById("category");
+            var categoryError = document.getElementById("categoryError");
+            var categoryValue = categoryInput.value.trim();
+
+            if (categoryValue === "") {
+                categoryError.textContent = "Category cannot be empty.";
+                categoryError.style.display = "block"; // Show the error message
+                event.preventDefault(); // Prevent form submission
+            } else {
+                categoryError.textContent = ""; // Clear the error message
+                categoryError.style.display = "none"; // Hide the error message
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const categoryInput = document.getElementById('category');
+            const categoryError = document.getElementById('categoryError');
+            
+            categoryInput.addEventListener('blur', () => {
+                validateInput(categoryInput, categoryError, 'Category cannot be empty.');
+            });
+        });
+
+        function validateInput(input, errorElement, errorMessage) {
+            const value = input.value.trim();
+            if (value === "") {
+                errorElement.textContent = errorMessage;
+                errorElement.style.display = "block"; // Show the error message
+            } else {
+                errorElement.textContent = "";
+                errorElement.style.display = "none"; // Hide the error message
+            }
+        }
+</script>
+</body>
+</html>

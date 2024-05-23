@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Finance Update</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .add-button {
+            background: #008000;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>Finance Update</p>
+        </div>
+        <ul>
+            <li>
+                <button class="cancel-button" id="cancelButton"><a href="/financeDashboard">Cancel</a></button>
+            </li>
+        </ul>
+    </nav>
+    <div class="form-container">
+        <div class="form">
+            <h1>Finance Update</h1>
+            <form method="post" th:action="@{/financeUpdateSave}" th:object="${financeDataDto}" onsubmit="return validateForm()" novalidate>
+            <div class="form-input">
+                <label for="date">Date:</label>
+                <input th:field="*{date}" type="date" id="date" name="date" required>
+                <span class="error-message" id="dateError"></span>
+            </div>
+            <div class="form-input">
+                <label for="revenue">Revenue:</label>
+                <input th:field="*{revenue}" type="number" id="revenue" name="revenue" required>
+                <span class="error-message" id="revenueError"></span>
+            </div>
+            <div class="form-input">
+                <label for="expenses">Expenses:</label>
+                <input th:field="*{expenses}" type="number" id="expenses" name="expenses" required>
+                <span class="error-message" id="expensesError"></span>
+            </div>
+            <div class="form-input">
+                <label for="currentAssets">Current Assets:</label>
+                <input th:field="*{currentAssets}" type="number" id="currentAssets" name="currentAssets" required>
+                <span class="error-message" id="currentAssetsError"></span>
+            </div>
+            <div class="form-input">
+                <label for="currentLiabilities">Current Liabilities:</label>
+                <input th:field="*{currentLiabilities}" type="number" id="currentLiabilities" name="currentLiabilities" required>
+                <span class="error-message" id="currentLiabilitiesError"></span>
+            </div>
+            <div class="center-button">
+                <button type="submit" class="add-button">Add Data</button>
+            </div>
+            </form>
+        </div>
+    </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var dateInput = document.getElementById("date");
+        var today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        dateInput.max = today;
+        document.getElementById("cancelButton").addEventListener("click", function() {
+            window.location.href = "/financeDashboard";
+        });
+    });
+     function validateForm() {
+    var dateInput = document.getElementById("date");
+    var revenueInput = document.getElementById("revenue");
+    var expensesInput = document.getElementById("expenses");
+    var assetsInput = document.getElementById("currentAssets");
+    var liabilitiesInput = document.getElementById("currentLiabilities");
+    var isValid = true;
+    if (!dateInput.value) {
+        showError("dateError", "Please enter a date.");
+        isValid = false;
+    } else {
+        hideError("dateError");
+    }
+    if (!revenueInput.value) {
+        showError("revenueError", "Please enter the revenue.");
+        isValid = false;
+    } else if (isNaN(revenueInput.value) || parseFloat(revenueInput.value) < 0) {
+        showError("revenueError", "Please enter a valid and non-negative value for revenue.");
+        isValid = false;
+    } else {
+        hideError("revenueError");
+    }
+    if (!expensesInput.value) {
+        showError("expensesError", "Please enter the expenses.");
+        isValid = false;
+    } else if (isNaN(expensesInput.value) || parseFloat(expensesInput.value) < 0) {
+        showError("expensesError", "Please enter a valid and non-negative value for expenses.");
+        isValid = false;
+    } else {
+        hideError("expensesError");
+    }
+    if (!assetsInput.value) {
+        showError("currentAssetsError", "Please enter the current assets.");
+        isValid = false;
+    } else if (isNaN(assetsInput.value) || parseFloat(assetsInput.value) < 0) {
+        showError("currentAssetsError", "Please enter a valid and non-negative value for current assets.");
+        isValid = false;
+    } else {
+        hideError("currentAssetsError");
+    }
+    if (!liabilitiesInput.value) {
+        showError("currentLiabilitiesError", "Please enter the current liabilities.");
+        isValid = false;
+    } else if (isNaN(liabilitiesInput.value) || parseFloat(liabilitiesInput.value) < 0) {
+        showError("currentLiabilitiesError", "Please enter a valid and non-negative value for current liabilities.");
+        isValid = false;
+    } else {
+        hideError("currentLiabilitiesError");
+    }
+    return isValid;
+    }
+    function showError(errorId, errorMessage) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = errorMessage;
+        errorElement.style.color = "red";
+        errorElement.style.display = "block";
+    }
+
+    function hideError(errorId) {
+        var errorElement = document.getElementById(errorId);
+        errorElement.innerHTML = "";
+        errorElement.style.display = "none";
+    }
+</script>
+<script>
+    const dateInput = document.getElementById('date');
+    const dateError = document.getElementById('dateError');
+    dateInput.addEventListener('blur', (event) => {
+      const date = event.target.value;
+      dateError.textContent = ''; 
+      if (date === '') {
+        showError('dateError', 'Date cannot be empty.');
+      } 
+    });
+    const revenueInput = document.getElementById('revenue');
+    const revenueError = document.getElementById('revenueError');
+    revenueInput.addEventListener('blur', (event) => {
+      const revenue = event.target.value;
+      revenueError.textContent = ''; 
+      if (revenue === '') {
+        showError('revenueError', 'Revenue cannot be empty.');
+      } 
+    });
+    const expensesInput = document.getElementById('expenses');
+    const expensesError = document.getElementById('expensesError');
+    expensesInput.addEventListener('blur', (event) => {
+      const expenses = event.target.value;
+      expensesError.textContent = ''; 
+      if (expenses === '') {
+        showError('expensesError', 'Expenses cannot be empty.');
+      } 
+    });
+    const currentAssetsInput = document.getElementById('currentAssets');
+    const currentAssetsError = document.getElementById('currentAssetsError');
+    currentAssetsInput.addEventListener('blur', (event) => {
+      const currentAssets = event.target.value;
+      currentAssetsError.textContent = ''; 
+      if (currentAssets === '') {
+        showError('currentAssetsError', 'Current Assets cannot be empty.');
+      } 
+    });
+    const currentLiabilitiesInput = document.getElementById('currentLiabilities');
+    const currentLiabilitiesError = document.getElementById('currentLiabilitiesError');
+    currentLiabilitiesInput.addEventListener('blur', (event) => {
+      const currentLiabilities = event.target.value;
+      currentLiabilitiesError.textContent = ''; 
+      if (currentLiabilities === '') {
+        showError('currentLiabilitiesError', 'Current Liabilities cannot be empty.');
+      } 
+    });
+</script>
+</body>
+</html>

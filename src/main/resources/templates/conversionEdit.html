@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion Rates Add</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .calculate-button {
+            background: rgb(0, 128, 255);
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            float: left; 
+        }
+        .calculate-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            float: center; 
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .form-input input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>Conversion Dashboard</p>
+        </div>
+        <ul>
+            <li>
+                <button class="cancel-button" id="cancelButton"><a href="/conversionDashboard">Cancel</a></button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="form-container">
+        <div class="form">
+            <h1>Conversion Rates Update</h1>
+            <form id="conversionForm" method="post" th:action="@{/conversionUpdateSave}" onsubmit="return validateForm()" novalidate>
+                <input type="hidden" id="id" name="id" th:value="${conversionDataDto.id}" />
+
+        <div>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" th:value="${date}" required>
+            <span class="error-message" id="dateError"></span>
+</div>
+<div>
+            <label for="noOfConversions">Number of Conversions:</label>
+            <input type="number" id="noOfConversions" name="noOfConversions" th:value="${noOfConversions}" required>
+             <span class="error-message" id="noOfConversionsError"></span>
+</div>
+       <div>
+            <label for="totalNumberOfVisitors">Total Number of Visitors:</label>
+            <input type="number" id="totalNumberOfVisitors" name="totalNumberOfVisitors" th:value="${totalNumberOfVisitors}" required>
+              <span class="error-message" id="totalNumberOfVisitorsError"></span>
+</div>
+
+                <div>
+                    <button class="update-button" id="updateButton" type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("noOfConversions").addEventListener("input", calculateConversionRate);
+            document.getElementById("totalNumberOfVisitors").addEventListener("input", calculateConversionRate);
+            var dateInput = document.getElementById("date");
+            dateInput.max = new Date().toISOString().split("T")[0];
+            dateInput.addEventListener("input", function () {
+                var selectedDate = new Date(dateInput.value);
+                var currentDate = new Date();
+                if (selectedDate > currentDate) {
+                    alert("Date cannot be in the future. Please select a valid date.");
+                    dateInput.value = currentDate.toISOString().split("T")[0];
+                }
+            });
+            function calculateConversionRate() {
+                var noOfConversionsInput = document.getElementById("noOfConversions").value;
+                var totalNumberOfVisitorsInput = document.getElementById("totalNumberOfVisitors").value;
+                var noOfConversions = parseFloat(noOfConversionsInput);
+                var totalNumberOfVisitors = parseFloat(totalNumberOfVisitorsInput);
+                if (!isNaN(noOfConversions) && !isNaN(totalNumberOfVisitors) && totalNumberOfVisitors > 0) {
+                    var conversionRate = (noOfConversions / totalNumberOfVisitors) * 100;
+                    conversionRate = Math.round(conversionRate * 100) / 100;
+                } else {
+                }
+            }
+            document.getElementById("conversionForm").addEventListener("submit", function (event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                }
+            });
+            function validateForm() {
+            var isValid = true;
+            var dateInput = document.getElementById("date");
+            var dateError = document.getElementById("dateError");
+            
+            if (!dateInput.value) {
+                displayError(dateError, "Please select a date.");
+                isValid = false;
+            } else {
+                hideError(dateError);
+            }
+            
+            var noOfConversionsInput = document.getElementById("noOfConversions");
+            var noOfConversionsError = document.getElementById("noOfConversionsError");
+            
+            if (!noOfConversionsInput.value) {
+                displayError(noOfConversionsError, "Number of conversions must not be empty.");
+                isValid = false;
+            } else if (parseInt(noOfConversionsInput.value) < 0) {
+                displayError(noOfConversionsError, "Number of conversions must be a non-negative integer.");
+                isValid = false;
+            } else {
+                hideError(noOfConversionsError);
+            }
+            
+            var totalNumberOfVisitorsInput = document.getElementById("totalNumberOfVisitors");
+            var totalNumberOfVisitorsError = document.getElementById("totalNumberOfVisitorsError");
+            
+            if (!totalNumberOfVisitorsInput.value) {
+                displayError(totalNumberOfVisitorsError, "Total number of visitors must not be empty.");
+                isValid = false;
+            } else if (parseInt(totalNumberOfVisitorsInput.value) < 0) {
+                displayError(totalNumberOfVisitorsError, "Total number of visitors must be a non-negative integer.");
+                isValid = false;
+            } else {
+                hideError(totalNumberOfVisitorsError);
+            }
+            
+            return isValid;
+        }
+
+        function displayError(element, errorMessage) {
+            element.textContent = errorMessage;
+            element.style.color = "red";
+            element.style.display = "block";
+        }
+
+        function hideError(element) {
+            element.textContent = "";
+            element.style.display = "none";
+        }
+            function setCustomValidityAndDisplayError(inputElement, errorId, errorMessage) {
+                inputElement.setCustomValidity(errorMessage);
+                displayError(errorId, errorMessage);
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+        const dateInput = document.getElementById('date');
+        const dateError = document.getElementById('dateError');
+        dateInput.addEventListener('blur', () => {
+            validateInput(dateInput, dateError, 'Please select a date.');
+        });
+
+        const noOfConversionsInput = document.getElementById('noOfConversions');
+        const noOfConversionsError = document.getElementById('noOfConversionsError');
+        noOfConversionsInput.addEventListener('blur', () => {
+            validateInput(noOfConversionsInput, noOfConversionsError, 'Number of conversions cannot be empty.');
+        });
+
+        const totalNumberOfVisitorsInput = document.getElementById('totalNumberOfVisitors');
+        const totalNumberOfVisitorsError = document.getElementById('totalNumberOfVisitorsError');
+        totalNumberOfVisitorsInput.addEventListener('blur', () => {
+            validateInput(totalNumberOfVisitorsInput, totalNumberOfVisitorsError, 'Total number of visitors cannot be empty.');
+        });
+
+        function validateInput(inputElement, errorElement, errorMessage) {
+            if (inputElement.value.trim() === "") {
+                showError(errorElement, errorMessage);
+            } else {
+                hideError(errorElement);
+            }
+        }
+
+        function showError(element, errorMessage) {
+            element.textContent = errorMessage;
+            element.style.color = "red";
+            element.style.display = "block";
+        }
+
+        function hideError(element) {
+            element.textContent = "";
+            element.style.display = "none";
+        }
+    });
+    </script>
+</body>
+</html>

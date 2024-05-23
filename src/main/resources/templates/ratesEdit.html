@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <title>View Acquisition Rates Edit</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background: linear-gradient(#033747, #012733);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            margin-top: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .form {
+            margin-top: 40px;
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <p>Sales Rates Dashboard</p>
+            </div>
+            <div class="button">
+                <ul>
+                    <li><button class="logout-button" id="cancelButton">Cancel</button></li>
+                </ul>
+            </div>
+        </nav>
+<div class="form-container">
+    <div class="form">
+        <h1>Rates Update</h1>
+        <form method="post" th:action="@{/updateRatesEntry}" th:object="${ratesDataDto}" onsubmit="return validateForm()">
+            <input type="hidden" th:field="*{id}" id="entryId" name="entryId">
+            <div class="form-input">
+                <label for="date">Date:</label>
+                <input th:field="*{date}" type="text" id="date" name="date" placeholder="yyyy-MM-dd" required>
+                <span class="error-message" id="dateError"></span>
+            </div>
+            <div class="form-input">
+                <label for="customers">Customers:</label>
+                <input th:field="*{customers}" type="number" id="customers" name="customers" required>
+                <span class="error-message" id="customersError"></span>
+            </div>
+            <div class="center-button">
+                <button class="update-button" id="updateButton" type="button" onclick="submitForm()">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $("#date").datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true
+        });
+        var today = new Date().toISOString().split('T')[0];
+        $("#date").attr('max', today);
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+    var dateInput = document.getElementById("date");
+    var existingDate = /*[[${ratesDataDto != null && ratesDataDto.date != null ? ratesDataDto.date : ''}]]*/ '';
+    if (existingDate && existingDate !== '') {
+        var parsedDate = new Date(existingDate);
+        var year = parsedDate.getFullYear();
+        var month = (parsedDate.getMonth() + 1).toString().padStart(2, '0');
+        var day = parsedDate.getDate().toString().padStart(2, '0');
+        var formattedDate = year + '-' + month + '-' + day;
+        dateInput.value = formattedDate;
+    }
+    var today = new Date().toISOString().split('T')[0];
+    dateInput.max = today;
+    document.getElementById("cancelButton").addEventListener("click", function() {
+        window.location.href = "/ratesDashboard";
+    });
+    });
+    function formatDate(date) {
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+    var day = date.getDate().toString().padStart(2, '0');
+    return year + '-' + month + '-' + day;
+    }
+    function submitForm() {
+        var formData = $('form').serialize(); 
+        $.ajax({
+            type: "POST",
+            url: "/updateRatesEntry", 
+            data: formData,
+            success: function(response) {
+                window.location.href = "/ratesDashboard";
+            },
+            error: function(xhr, status, error) {
+                console.error("Error occurred while updating rates:", error);
+            }
+        });
+    }
+    function validateForm() {
+        var dateInput = document.getElementById("date");
+        var customersInput = document.getElementById("customers");
+        if (!dateInput.value) {
+            displayError(document.getElementById("dateError"), "Please enter a date.");
+            return false;
+        } else {
+            hideError(document.getElementById("dateError"));
+        }
+        if (!customersInput.value.trim()) {
+            displayError(document.getElementById("customersError"), "Please enter the number of customers.");
+            return false;
+        } else {
+            hideError(document.getElementById("customersError"));
+        }
+        var customersValue = parseFloat(customersInput.value);
+        if (isNaN(customersValue) || customersValue < 0) {
+            displayError(document.getElementById("customersError"), "Please enter a non-negative number of customers.");
+            return false;
+        } else {
+            hideError(document.getElementById("customersError"));
+        }
+        return true;
+    }
+    function displayError(errorElement, errorMessage) {
+        errorElement.innerHTML = errorMessage;
+        errorElement.style.color = "red";
+        errorElement.style.display = "block";
+    }
+
+    function hideError(errorElement) {
+        errorElement.innerHTML = "";
+        errorElement.style.display = "none";
+    }
+    function submitForm() {
+        if (validateForm()) {
+            document.querySelector("form").submit();
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        var dateInput = document.getElementById("date");
+        var customersInput = document.getElementById("customers");
+        var dateError = document.getElementById("dateError");
+        var customersError = document.getElementById("customersError");
+
+        dateInput.addEventListener("blur", function () {
+            validateDate();
+        });
+
+        customersInput.addEventListener("blur", function () {
+            validateCustomers();
+        });
+
+        dateInput.addEventListener("input", function () {
+            hideError(dateError);
+        });
+
+        customersInput.addEventListener("input", function () {
+            hideError(customersError);
+        });
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            if (!validateDate() || !validateCustomers()) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    function validateDate() {
+        var dateInput = document.getElementById("date");
+        var dateError = document.getElementById("dateError");
+
+        if (!dateInput.value.trim()) {
+            displayError(dateError, "Please enter a date.");
+            return false;
+        } else {
+            hideError(dateError);
+            return true;
+        }
+    }
+
+    function validateCustomers() {
+        var customersInput = document.getElementById("customers");
+        var customersError = document.getElementById("customersError");
+
+        if (!customersInput.value.trim()) {
+            displayError(customersError, "Please enter customers.");
+            return false;
+        } else {
+            hideError(customersError);
+            return true;
+        }
+    }
+
+    function displayError(element, errorMessage) {
+        element.textContent = errorMessage;
+        element.style.color = "red";
+        element.style.display = "block";
+    }
+
+    function hideError(element) {
+        element.textContent = "";
+        element.style.display = "none";
+    }
+</script>
+</body>
+</html>

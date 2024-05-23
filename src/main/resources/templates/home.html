@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css></head>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <title>HomePage</title>
+<style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+            color: black;
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+        .menu-toggle i {
+            font-size: 24px;
+            color: black;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0; 
+            position: fixed;
+            z-index: 1;
+            top: 75px;
+            left: 0;
+            background-color: #0056b3;
+            padding-top: 20px;
+            transition: width 0.3s ease; 
+            overflow: hidden; 
+        }
+
+        .sidenav.active {
+            width: 250px; 
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #c5c509;
+        }
+
+        .logout-button-sidenav {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .logout-button-sidenav:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center; 
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .financial-con {
+            margin-top: 80px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        .sales-con {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            text-decoration: underline;
+        }
+        .chart-container {
+            width: 80%;
+            max-width: 440px; 
+            margin: 0 auto; 
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 3px;
+        }
+
+        .chart-heading {
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        canvas.chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+        .large-box {
+            width: 200px;
+            height: 260px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            color: black;
+        }
+        .small1-box {
+            width: 100%;
+            text-align: right; 
+        }
+        .small-line {
+            width: 100%;
+            height: 2px;
+            background-color: black;
+            margin: 5px 0;
+        }
+        .medium-box {
+            width: 150px;
+            height: 150px;
+            background-color: #ccc;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        .second-box {
+            width: 400px;
+            height: 260px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .data-box {
+            width: 400px;
+            height: 260px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .third-box {
+            width: 400px;
+            height: 300px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            margin: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .small1-box {
+            width: auto;
+            height: auto;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            margin: 5px 0;
+            padding: 5px 10px;
+            text-align: left;
+        }
+        .small-line {
+            width: 100%;
+            height: 2px;
+            background-color: black;
+            margin: 5px 0;
+        }
+        .sales-con {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        .small-box {
+            width: 100px;
+            height: 100px;
+            background-color: #ccc;
+            border-radius: 8px;
+            margin: 10px;
+        }
+
+        .fa-solid.fa-bars {
+            font-size: 24px;
+            color: white;
+            margin-right: 30px;
+            margin-left: 30px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 220px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .larger-text {
+    font-size: 24px;
+}
+
+
+        @media only screen and (max-width: 768px) {
+            .sidenav {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease; 
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .menu-toggle.active {
+                color: red; 
+            }
+
+            .sidenav.active {
+                width: 250px; 
+            }
+        }
+    </style>
+</head>
+<div>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <i class="fa-solid fa-bars menu-toggle"></i> 
+                <p>Saranya Jash Corporation</p>
+            </div>
+        </nav>
+        <div class="sidenav">
+            <div class="dropdown">
+                <a href="#">Dashboards<i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <a href="/financeDashboard">Finance Metrics</a>
+                        <a href="/salesDashboard">Sales & Marketing Metrics</a>
+                        <a href="/operationalDashboard">Operational Metrics</a>
+                    </div>
+                </li>
+            </div>
+            <a href="/profile">View Profile</a>
+            <a href="/chatRoom">chat Room</a>
+            <button class="logout-button-sidenav" id="logoutButton">Logout</button>
+        </div>
+        <div class="financial-con">            
+            <div class="large-box" id="headcountBox">
+                <div class="small1-box" style="font-weight: bold;">Headcount</div>
+                <div class="small-line"></div>
+                <div class="small1-box" id="financeCount">Finance: 0</div>
+                <div class="small-line"></div>
+                <div class="small1-box" id="salesCount">Sales & Marketing: 0</div>
+                <div class="small-line"></div>
+                <div class="small1-box" id="operationalCount">Operational: 0</div>
+                <div class="small-line"></div>
+                <div class="small1-box" id="totalStudentsCount">Total: 0</div>
+            </div>
+            <div class="large-box" id="headcountBox">
+                    <div class="small1-box" style="font-weight: bold;">Sales Team</div>
+                    <div class="small-line"></div>
+                    <div class="small1-box" id="todayRevenue">Revenue for Today: 0</div> <!-- Add this line -->
+                    <div class="small-line"></div>
+                    <div class="small1-box" id="acquisitionRate">Acquisition Rate for Month: 0</div>
+                    <div class="small-line"></div>
+                    <div class="small1-box" id="conversionRates">Conversion Rate for Month: 0</div>
+                </div>
+            <div class="chart-container">
+        <h2 class="chart-heading">Monthly Profit</h2>
+        <canvas id="monthlyProfitChart" class="chart-canvas"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2 class="chart-heading">Revenue By Month</h2>
+        <canvas id="myChart" class="chart-canvas"></canvas>
+    </div>
+        </div>
+        <div class="sales-con">
+			<div class="chart-container">
+        <h2 class="chart-heading">Conversion Rate By Month</h2>
+        <canvas id="conversionChart" class="chart-canvas"></canvas>
+    </div>
+    <div class="chart-container">
+        <h2 class="chart-heading">Acquisition Rates</h2>
+        <canvas id="ratesChart" class="chart-canvas"></canvas>
+    </div>
+    <div class="chart-container">
+        <h2 class="chart-heading">Inventory By Week</h2>
+        <canvas id="operationaDataChart" class="chart-canvas"></canvas>
+    </div>
+        </div>
+    </div>
+</div>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuToggle = document.querySelector(".menu-toggle");
+            const sideNav = document.querySelector(".sidenav");
+
+            menuToggle.addEventListener("click", function () {
+                sideNav.classList.toggle("active");
+                menuToggle.classList.toggle("active");
+            });
+
+            const dropdown = document.querySelector(".dropdown");
+
+            dropdown.addEventListener("click", function () {
+                dropdown.classList.toggle("active");
+            });
+        });
+    </script>
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+    fetchCounts();
+});
+document.getElementById("logoutButton").addEventListener("click", function() {
+            window.location.href = "/login";
+        });
+function fetchCounts() {
+    fetch('/api/totalStudents')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error fetching total students');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const totalStudentsElement = document.getElementById('totalStudentsCount');
+            totalStudentsElement.innerHTML = `Total: <span style="font-size: 20px; font-weight: bold;">${data}</span>`;
+        })
+        .catch(error => {
+            console.error('Error fetching total students:', error);
+            const totalStudentsElement = document.getElementById('totalStudentsCount');
+            totalStudentsElement.innerHTML = 'Total: N/A';
+        });
+    fetch('/api/totalWorkers/Sales%20%26%20Marketing') 
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error fetching total sales workers');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data received:', data);
+        const salesCountElement = document.getElementById('salesCount');
+        salesCountElement.innerHTML = `Sales & Marketing: <span style="font-size: 20px; font-weight: bold;">${data}</span>`;
+    })
+    .catch(error => {
+        console.error('Error fetching total sales workers:', error);
+        document.getElementById('salesCount').innerText = 'Sales & Marketing: N/A';
+    });
+
+fetch('/api/totalWorkers/Finance')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error fetching total finance workers');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const financeCountElement = document.getElementById('financeCount');
+        financeCountElement.innerHTML = `Finance: <span style="font-size: 20px; font-weight: bold;">${data}</span>`;
+    })
+    .catch(error => {
+        console.error('Error fetching total finance workers:', error);
+        document.getElementById('financeCount').innerText = 'Finance: N/A';
+    });
+
+fetch('/api/totalWorkers/Operational')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error fetching total operational workers');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const operationalCountElement = document.getElementById('operationalCount');
+        operationalCountElement.innerHTML = `Operational: <span style="font-size: 20px; font-weight: bold;">${data}</span>`;
+    })
+    .catch(error => {
+        console.error('Error fetching total operational workers:', error);
+        document.getElementById('operationalCount').innerText = 'Operational: N/A';
+    });
+    }
+	    document.addEventListener("DOMContentLoaded", function () {
+    fetch("/netProfitMarginData")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Creating Monthly Profit chart with data:', data);
+            createMonthlyProfitChart(data);
+        })
+        .catch(error => console.error("Error fetching Net Profit Margin data:", error.message));
+
+    function createMonthlyProfitChart(data) {
+        const monthlyProfitData = {};
+        data.forEach(item => {
+            const date = new Date(item.date);
+            const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
+            if (!monthlyProfitData[monthYear]) {
+                monthlyProfitData[monthYear] = 0;
+            }
+            monthlyProfitData[monthYear] += item.netProfitMargin;
+        });
+
+        const labels = Object.keys(monthlyProfitData);
+        const profitValues = Object.values(monthlyProfitData);
+        const backgroundColors = [
+            '#28a745',
+            '#dc3545', 
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)', 
+        ];
+
+        const ctx = document.getElementById('monthlyProfitChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Profit',
+                    data: profitValues,
+                    backgroundColor: backgroundColors,
+                    borderColor: ['#28a745', 
+            '#dc3545', 
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", async function () {
+            async function fetchAndCreateChart(endpoint, createChartFunction) {
+                try {
+                    const response = await fetch(endpoint);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch data from ${endpoint}. HTTP error! Status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log(`Creating chart for ${endpoint} with data:`, data);
+                    createChartFunction(data);
+                } catch (error) {
+                    console.error(`Error fetching ${endpoint} data:`, error.message);
+                }
+            }
+
+            function aggregateDataByWeek(data) {
+                const weeklyData = {};
+                data.forEach(entry => {
+                    const date = new Date(entry.date);
+                    const year = date.getFullYear();
+                    const weekNumber = getWeekNumber(date);
+                    const weekKey = `${year}-W${weekNumber}`;
+                    if (!weeklyData[weekKey]) {
+                        weeklyData[weekKey] = [];
+                    }
+                    weeklyData[weekKey].push(entry.value);
+                });
+                const weeklyAverages = {};
+                Object.keys(weeklyData).forEach(weekKey => {
+                    const values = weeklyData[weekKey];
+                    const sum = values.reduce((acc, curr) => acc + curr, 0);
+                    const average = sum / values.length;
+                    weeklyAverages[weekKey] = average;
+                });
+                return weeklyAverages;
+            }
+
+            function getWeekNumber(date) {
+                const startOfWeek = new Date(date);
+                startOfWeek.setHours(0, 0, 0, 0);
+                startOfWeek.setDate(startOfWeek.getDate() + 4 - (startOfWeek.getDay() || 7));
+                const yearStart = new Date(startOfWeek.getFullYear(), 0, 1);
+                const weekNumber = Math.ceil((((startOfWeek - yearStart) / 86400000) + 1) / 7);
+                return weekNumber;
+            }
+
+            const createChart = (data) => {
+                const ctx = document.getElementById('operationaDataChart').getContext('2d');
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+                const backgroundColors = [  
+                    '#ffc107',  
+                    '#dc3545', 
+                    '#17a2b8',  
+                    '#007bff', 
+                    '#28a745'
+                        
+                ];
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Operational Data',
+                            backgroundColor: backgroundColors,
+                            borderColor: ['#ffc107',  
+                    '#dc3545', 
+                    '#17a2b8',  
+                    '#007bff', 
+                    '#28a745'],
+                            data: values,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            };
+
+            await fetchAndCreateChart('/api/operationalData', (data) => {
+                const aggregatedData = aggregateDataByWeek(data);
+                createChart(aggregatedData);
+            });
+        });
+			document.addEventListener("DOMContentLoaded", async function () {
+    fetch("/api/figures")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Revenue Data:', data);
+            const monthlyRevenueData = groupRevenueByMonth(data.revenueData);
+            createRevenueChart(monthlyRevenueData);
+        })
+        .catch(error => {
+            console.error("Error fetching revenue data:", error.message);
+        });
+    function groupRevenueByMonth(revenueData) {
+        const monthlyRevenueData = {};
+        revenueData.forEach(entry => {
+            const date = new Date(entry[0]);
+            const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            if (!monthlyRevenueData[monthYear]) {
+                monthlyRevenueData[monthYear] = 0;
+            }
+            monthlyRevenueData[monthYear] += entry[1];
+        });
+        return monthlyRevenueData;
+    }
+    function createRevenueChart(monthlyRevenueData) {
+        const dates = Object.keys(monthlyRevenueData);
+        const revenues = Object.values(monthlyRevenueData);
+        const chartData = {
+            labels: dates,
+            datasets: [{
+                label: 'Revenue',
+                data: revenues,
+                fill: false,
+                backgroundColor: '#007bff',
+                    borderColor: '#007bff', 
+                tension: 0.1
+            }]
+        };
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("/acquisitionRateData") 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Acquisition Rate Data:', data);
+            createDailyChart(data);
+        })
+        .catch(error => {
+            console.error("Error fetching acquisition rate data:", error.message);
+        });
+
+    function createDailyChart(acquisitionRateData) {
+        if (acquisitionRateData && acquisitionRateData.length > 0) {
+            const dates = acquisitionRateData.map(entry => entry.date);
+            const rates = acquisitionRateData.map(entry => entry.acquisitionRate);
+
+            const dailyChartData = {
+                labels: dates,
+                datasets: [{
+                    label: 'Acquisition Rates',
+                    data: rates,
+                    backgroundColor: '#007bff',
+                    borderColor: '#007bff', 
+                    borderWidth: 1
+                }]
+            };
+            const ctx = document.getElementById('ratesChart').getContext('2d');
+            const dailyChart = new Chart(ctx, {
+                type: 'line', 
+                data: dailyChartData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Acquisition Rate Data is empty or undefined.');
+        }
+    }
+});
+      document.addEventListener('DOMContentLoaded', function () {
+    fetch("/conversionData") 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(chartData => {
+            createMonthlyConversionChart(chartData);
+        })
+        .catch(error => {
+            console.error("Error fetching conversion data:", error.message);
+        });
+
+    function createMonthlyConversionChart(chartData) {
+        const monthlyData = chartData.reduce((acc, entry) => {
+            const date = new Date(entry.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const key = `${year}-${month}`;
+            if (!acc[key]) {
+                acc[key] = { conversions: 0, visitors: 0 };
+            }
+            acc[key].conversions += entry.noOfConversions;
+            acc[key].visitors += entry.totalNumberOfVisitors;
+            return acc;
+        }, {});
+        const months = Object.keys(monthlyData);
+        const conversionRates = months.map(month => {
+            const { conversions, visitors } = monthlyData[month];
+            return (conversions / visitors) * 100;
+        });
+        const ctx = document.getElementById('conversionChart').getContext('2d');
+        const conversionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Conversion Rate (%)',
+                    data: conversionRates,
+                    fill: false,
+                    backgroundColor: '#28a745',
+                    borderColor: '#28a745',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Conversion Rate (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+ </script>
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+    fetch("/api/currentProducts") 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(products => {
+            console.log('Current Products:', products);
+            displayProducts(products);
+        })
+        .catch(error => {
+            console.error("Error fetching current products:", error.message);
+        });
+    function displayProducts(products) {
+        const productListElement = document.getElementById('productList');
+        if (productListElement) {
+            productListElement.innerHTML = '';
+            const productNames = products.map(product => product.productName).join(', ');
+            productListElement.innerHTML = `<strong style="font-size: 24px;">Current Sales Products:</strong> ${productNames}`;
+        } else {
+            console.error("Error: Element with ID 'productList' not found.");
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch("/api/currentMonthAcquisitionRate")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(acquisitionRate => {
+            console.log('Current Month Acquisition Rate:', acquisitionRate);
+            updateAcquisitionRateUI(acquisitionRate);
+        })
+        .catch(error => {
+            console.error("Error fetching acquisition rate data:", error.message);
+        });
+    function updateAcquisitionRateUI(acquisitionRate) {
+        const acquisitionRateElement = document.getElementById('acquisitionRate');
+        if (acquisitionRateElement) {
+            if (acquisitionRate !== null && acquisitionRate !== undefined) {
+                const formattedAcquisitionRate = acquisitionRate.toFixed(2);
+                acquisitionRateElement.innerHTML = `Acquisition Rate:<span style="font-size: 20px; font-weight: bold;">${formattedAcquisitionRate}%`;
+            } else {
+                acquisitionRateElement.innerHTML = "<strong style='font-size: 24px;'>Acquisition Rate:</strong> Data not available";
+            }
+        } else {
+            console.error("Error: Element with ID 'acquisitionRate' not found.");
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const currentDate = new Date();
+    const currentDateISO = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    fetch(`/api/todayRevenue?date=${currentDateISO}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Today\'s Revenue:', data);
+            updateRevenueUI(data);
+        })
+        .catch(error => {
+            console.error("Error fetching today's revenue:", error.message);
+        });
+    function updateRevenueUI(revenue) {
+        const todayRevenueElement = document.getElementById('todayRevenue');
+        if (todayRevenueElement) {
+            todayRevenueElement.innerHTML = `Today's Revenue:<span style="font-size: 20px; font-weight: bold;">${revenue}`;
+        } else {
+            console.error("Error: Element with ID 'todayRevenue' not found.");
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch("/api/currentMonthConversionRate") 
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(conversionRate => {
+            console.log('Current Month Conversion Rate:', conversionRate);
+            updateConversionRateUI(conversionRate);
+        })
+        .catch(error => {
+            console.error("Error fetching conversion rate data:", error.message);
+        });
+    function updateConversionRateUI(conversionRate) {
+        const conversionRateElement = document.getElementById('conversionRates');
+        if (conversionRateElement) {
+            const formattedConversionRate = conversionRate.toFixed(2);
+            conversionRateElement.innerHTML = `Conversion Rate for Month:<span style="font-size: 20px; font-weight: bold;"> ${formattedConversionRate}%`;
+        } else {
+            console.error("Error: Element with ID 'conversionRates' not found.");
+        }
+    }
+});
+</script>
+
+</body>
+</html>

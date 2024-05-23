@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .form-input input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>Sales Figures Dashboard</p>
+        </div>
+        <ul>
+            <li>
+                <button class="cancel-button" id="cancelButton"><a href="/showProduct">Cancel</a></button>
+            </li>
+        </ul>
+    </nav>
+    <div class="form-container">
+        <div class="form">
+            <h1>Sales Figures Update</h1>
+            <form method="post" th:action="@{/updateProduct}" th:object="${productData}" onsubmit="return validateForm()">
+				<input type="hidden" th:field="*{id}" />
+                <div class="form-input">
+                    <label for="productName">Product Name:</label>
+                    <input th:field="*{productName}" type="text" id="productName" name="productName">
+                    <span class="error-message" id="productNameError"></span>
+                </div>
+                <div class="form-input">
+                    <label for="price">Price:</label>
+                    <input th:field="*{price}" type="number" id="price" name="price">
+                    <span class="error-message" id="priceError"></span>
+                </div>
+                <div class="center-button">
+                    <button class="update-button" id="updateButton" type="submit">Update Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+     <script>
+        function validateForm() {
+            var productNameInput = document.getElementById("productName");
+            var productNameError = document.getElementById("productNameError");
+            var priceInput = document.getElementById("price");
+            var priceError = document.getElementById("priceError");
+            var isValid = true;
+
+            productNameError.innerText = "";
+            priceError.innerText = "";
+
+            if (!productNameInput.value.trim()) {
+                productNameError.innerText = "Product name cannot be empty.";
+                productNameError.style.display = "block";
+                isValid = false;
+            } else {
+                productNameError.style.display = "none";
+            }
+
+            if (!priceInput.value.trim()) {
+                priceError.innerText = "Price cannot be empty.";
+                priceError.style.display = "block";
+                isValid = false;
+            } else {
+                var price = parseFloat(priceInput.value.trim());
+                if (isNaN(price) || price <= 0) {
+                    priceError.innerText = "Price must be a valid number greater than 0.";
+                    priceError.style.display = "block";
+                    isValid = false;
+                } else {
+                    priceError.style.display = "none";
+                }
+            }
+
+            return isValid;
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+        const productNameInput = document.getElementById('productName');
+        const productNameError = document.getElementById('productNameError');
+        const priceInput = document.getElementById('price');
+        const priceError = document.getElementById('priceError');
+
+        productNameInput.addEventListener('blur', function () {
+            validateField(productNameInput, productNameError);
+        });
+        productNameInput.addEventListener('focus', function () {
+            clearError(productNameError);
+        });
+
+        priceInput.addEventListener('blur', function () {
+            validateField(priceInput, priceError);
+        });
+        priceInput.addEventListener('focus', function () {
+            clearError(priceError);
+        });
+    });
+
+    function validateField(inputElement, errorElement) {
+        const inputValue = inputElement.value.trim();
+
+        if (inputValue === '') {
+            errorElement.innerText = 'This field cannot be empty.';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.innerText = '';
+            errorElement.style.display = 'none';
+        }
+    }
+
+    function clearError(errorElement) {
+        errorElement.innerText = '';
+        errorElement.style.display = 'none';
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <title>View Sales Figures</title>
+    
+    <style>
+		body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+            color: black;
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+        .menu-toggle i {
+            font-size: 24px;
+            color: black;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0; 
+            position: fixed;
+            z-index: 1;
+            top: 75px;
+            left: 0;
+            background-color: #0056b3;
+            padding-top: 20px;
+            transition: width 0.3s ease; 
+            overflow: hidden; 
+        }
+
+        .sidenav.active {
+            width: 250px; 
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #c5c509;
+        }
+
+        .logout-button-sidenav {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .logout-button-sidenav:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center; 
+        }
+ul {
+    float: right;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+li {
+    display: inline-block;
+    margin-left: 20px;
+}
+.update-button {
+    background: green;
+    border: none;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    padding: 10px 20px; 
+}
+
+.update-button:hover {
+    text-decoration: underline;
+}
+
+.transparent-button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+}
+
+.transparent-button:hover {
+    text-decoration: underline;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+ table {
+    position: relative;
+    border-collapse: collapse;
+    width: 100%;
+  
+} 
+.figures-con{
+	margin-top: 80px;
+}
+
+.h1 {
+    color: red;
+    text-align: center; 
+   
+    font-size: 50px;
+    
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+#myChart {
+    max-width: 800px;
+    margin: 20px auto;
+    display: block;
+    background-color: rgb(255, 255, 255);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+button {
+    background-color:rgb(205, 50, 107) ;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color:rgb(205, 50, 107) ;
+}
+
+#backToDashboardButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+.fa-solid.fa-bars {
+            font-size: 24px;
+            color: rgb(255, 255, 255);
+            margin-right: 30px;
+            margin-left: 30px;
+        }
+        @media only screen and (max-width: 768px) {
+            .sidenav {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease; 
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .menu-toggle.active {
+                color: red; 
+            }
+
+            .sidenav.active {
+                width: 250px; 
+            }
+        }
+    </style>   
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <i class="fa-solid fa-bars menu-toggle"></i> 
+                <p>Sales Figures Dashboard</p>
+            </div>
+        </nav>
+        <div class="sidenav">           
+            <a href="/figuresUpdate">Add Sales Data</a>
+            <a href="/showProduct">Product Details</a>
+            <a href="/revenueDetails">Revenue Details</a>
+            <a href="/profile">View Profile</a>
+            <a href="/chatRoom5">chat Room</a>
+            <button class="logout-button-sidenav" id="logoutButton">Logout</button>
+        </div>
+        
+        <div class="figures-con">
+            <h1 class="h1">Sales Figures Data</h1>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Product Name</th>
+                            <th>Quantity Sold</th>
+                            <th>Total Revenue</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       <tr th:each="figuresData, rowId : ${figuresDataList}" id="row${figuresData.id}">
+    <td th:text="${figuresData.date}"></td>
+    <td th:text="${figuresData.productName}"></td>
+    <td th:text="${figuresData.quantitySold}"></td>
+    <td th:text="${figuresData.totalRevenue}"></td>
+    <td>
+<button th:attr="data-id=${figuresData.id}" style="background-color: #008000;" onclick="editRow(this.getAttribute('data-id'))">Edit</button>
+<button class="delete-button" th:data-id="${figuresData.id}">Delete</button>
+
+    </td>
+</tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <div>
+                    <canvas id="myChart" width="800" height="400"></canvas>
+                </div>
+            </div>
+            <div>
+            <th:block th:if="${#authorization.expression('hasAnyAuthority(''HO_Company'',''Saleshead'')')}">
+                <div id="backToDashboardButton">
+                    <a th:href="@{/salesDashboard}">
+                        <button>Back To Dashboard</button>
+                    </a>
+                </div>
+            </th:block>
+        </div>
+        </div>
+    </div>
+    <script>
+		document.getElementById("logoutButton").addEventListener("click", function () {
+        window.location.href = "/login";
+    });
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuToggle = document.querySelector(".menu-toggle");
+            const sideNav = document.querySelector(".sidenav");
+
+            menuToggle.addEventListener("click", function () {
+                sideNav.classList.toggle("active");
+                menuToggle.classList.toggle("active");
+            });
+
+            const dropdown = document.querySelector(".dropdown");
+
+            dropdown.addEventListener("click", function () {
+                dropdown.classList.toggle("active");
+            });
+        });
+    </script>
+    <script>
+        function editRow(id) {
+            window.location.href = '/figuresEdit/' + id;
+        }
+
+        $(document).ready(function() {
+            // Attach click event handler to all delete buttons
+            $('button.delete-button').click(function() {
+                var id = $(this).data('id');
+                deleteRow(id);
+            });
+        });
+
+        function deleteRow(id) {
+            if (confirm("Are you sure you want to delete this record?")) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/deleteFigure/' + encodeURIComponent(id),
+                    success: function(response) {
+                        $('#row' + id).remove();
+                        console.log('Record deleted successfully');
+                        location.reload(); 
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting record:', error);
+                    }
+                });
+            }
+        }
+    </script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var revenueData = /*[[${revenueData}]]*/ [];
+    var dates = revenueData.map(entry => new Date(entry[0]));
+    var revenues = revenueData.map(entry => entry[1]);
+    var chartData = {
+        labels: dates,
+        datasets: [{
+            label: 'Revenue',
+            data: revenues,
+            backgroundColor: ['#28a745', 
+            '#dc3545', 
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)'], 
+            borderColor: ['#28a745', 
+            '#dc3545', 
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)'],
+            borderWidth: 1
+        }]
+    };
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

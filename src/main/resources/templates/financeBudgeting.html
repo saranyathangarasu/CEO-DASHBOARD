@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <title>Budgeting Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+            color: black;
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+        .menu-toggle i {
+            font-size: 24px;
+            color: black;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0; 
+            position: fixed;
+            z-index: 1;
+            top: 75px;
+            left: 0;
+            background-color: #0056b3;
+            padding-top: 20px;
+            transition: width 0.3s ease; 
+            overflow: hidden; 
+        }
+
+        .sidenav.active {
+            width: 250px; 
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #c5c509;
+        }
+
+        .logout-button-sidenav {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .logout-button-sidenav:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center; 
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            margin-top: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .form {
+            margin-top: 40px;
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .rates-con {
+            padding-top: 10px;
+            margin-top: -20px;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #ratesChart {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color:rgb(205, 50, 107) ;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color:rgb(205, 50, 107) ;
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        td[data-type="percentage"]::after {
+            content: '%';
+        }
+        .form-input select {
+            width: 103%;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        .fa-solid.fa-bars {
+            font-size: 24px;
+            color: rgb(255, 255, 255);
+            margin-right: 30px;
+            margin-left: 30px;
+        }
+        @media only screen and (max-width: 768px) {
+            .sidenav {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease; 
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .menu-toggle.active {
+                color: red; 
+            }
+
+            .sidenav.active {
+                width: 250px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <i class="fa-solid fa-bars menu-toggle"></i> 
+                <p>Finance Dashboard</p>
+            </div>
+        </nav>
+        <div class="sidenav">           
+            <a href="/financeUpdate">Add Category</a>
+            <a href="/profile">View Profile</a>
+            <a href="/chatRoom7">chat Room</a>
+            <button class="logout-button-sidenav">Logout</button>
+        </div>
+        <div class="leads-con">
+            <div class="form-container">
+                <div class="form">
+                    <h1>Add Budgeting</h1>
+                   <form action="/budgetingAdd" method="post" th:object="${budgeting}" onsubmit="return validateForm()">
+    <div class="form-input">
+        <label for="date">Date:</label>
+        <input th:field="*{date}" type="date" id="date" name="date" pattern="\d{4}-\d{2}-\d{2}">
+        <span class="error-message" id="dateError"></span>
+    </div>
+    <div class="form-input">
+    <label for="category">Category Name:</label>
+    <select th:field="*{category}" id="category" name="category">
+        <option value="">Select Category</option>
+        <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+    </select>
+    <span class="error-message" id="categoryError"></span>
+    </div>
+    <div class="form-input">
+        <label for="plannedAmount">Planned Amount:</label>
+        <input th:field="*{plannedAmount}" type="number" id="plannedAmount" name="plannedAmount">
+        <span class="error-message" id="plannedAmountError"></span>
+    </div>
+    <div class="form-input">
+        <label for="actualAmount">Actual Amount:</label>
+        <input th:field="*{actualAmount}" type="number" id="actualAmount" name="actualAmount">
+        <span class="error-message" id="actualAmountError"></span>
+    </div>
+    <div class="center-button">
+        <button id="addDataButton" class="update-button" type="submit">Add Data</button>
+    </div>
+</form>
+        </div>
+            </div>
+            <h1 class="h1">Finance Budgeting</h1>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Planned Amount</th>
+                            <th>Actual Amount</th>
+                            <th>Variance</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="data : ${budgetingDataList}" id="row_${data.id}">
+                            <td th:text="${#temporals.format(data.date, 'yyyy-MM-dd')}"></td>
+                            <td th:text="${data.category}"></td>
+                            <td th:text="${data.plannedAmount}"></td>
+                            <td th:text="${data.actualAmount}"></td>
+                            <td th:if="${data.getVariance() != null}" th:text="${data.getVariance()}"></td>
+                            <td>
+                                <button type="button" style="background-color: #008000;" th:onclick="'editBudgetingData(' + ${data.id} + ')'" >Edit</button>
+                                <button class="delete-button" th:onclick="'deleteEntry(\'' + ${data.id} + '\')'">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+            <th:block th:if="${#authorization.expression('hasAnyAuthority(''HO_Company'',''Financehead'')')}">
+                <div id="backToDashboardButton">
+                    <a th:href="@{/financeDashboard}">
+                        <button>Back To Dashboard</button>
+                    </a>
+                </div>
+            </th:block>
+        </div>
+    </div>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('max', today);
+            }
+        });
+function deleteEntry(id) {
+    var confirmation = confirm("Are you sure you want to delete this entry?");
+    if (!confirmation) {
+        return;
+    }
+    fetch(`/budgetingDelete/${id}`, { 
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            alert("Entry deleted successfully");
+            window.location.reload(); 
+        } 
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Failed to delete entry");
+    });
+}
+document.addEventListener("DOMContentLoaded", function () {
+    var deleteButtons = document.querySelectorAll(".delete-button");
+    deleteButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var id = this.getAttribute("data-id"); 
+            console.log("ID fetched:", id); 
+            deleteEntry(id);
+        });
+    });
+});
+document.getElementById("Category").addEventListener("click", function() {
+    window.location.href = "/category";
+});
+document.getElementById("logoutButton").addEventListener("click", function() {
+    window.location.href = "/login";
+});
+     fetch('/api/categories')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(categories => {
+                console.log('Categories received:', categories);
+                const categoryDropdown = document.getElementById('category');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.text = category.category;
+                    categoryDropdown.appendChild(option); 
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching categories:', error);
+            });
+function calculateVariance(plannedAmount, actualAmount) {
+    return (actualAmount - plannedAmount).toFixed(2);
+}
+function editBudgetingData(budgetingId) {
+    window.location.href = `/budgetingEdit/${budgetingId}`;
+}
+    document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector('form');
+            const dateInput = document.getElementById('date');
+            const categoryInput = document.getElementById('category');
+            const plannedAmountInput = document.getElementById('plannedAmount');
+            const actualAmountInput = document.getElementById('actualAmount');
+            if (form && dateInput && categoryInput && plannedAmountInput && actualAmountInput) {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    if (!validateForm()) {
+                        return false;
+                    }
+                    form.submit();
+                });
+            }
+            function validateForm() {
+    let isValid = true;
+    if (!dateInput.value) {
+        showError('Please enter a date', dateInput);
+        isValid = false;
+    } else {
+        removeError(dateInput);
+    }
+    if (!categoryInput.value) {
+        showError('Please select a category', categoryInput);
+        isValid = false;
+    } else {
+        removeError(categoryInput);
+    }
+    if (!plannedAmountInput.value) {
+        showError('Please enter a planned amount', plannedAmountInput);
+        isValid = false;
+    } else if (plannedAmountInput.value < 0) {
+        showError('Planned amount must be a positive number', plannedAmountInput);
+        isValid = false;
+    } else {
+        removeError(plannedAmountInput);
+    }
+    if (!actualAmountInput.value) {
+        showError('Please enter an actual amount', actualAmountInput);
+        isValid = false;
+    } else if (actualAmountInput.value < 0) {
+        showError('Actual amount must be a positive number', actualAmountInput);
+        isValid = false;
+    } else {
+        removeError(actualAmountInput);
+    }
+    return isValid;
+}          
+        });
+        function showError(message, inputElement) {
+            const errorMessageElement = inputElement.nextElementSibling;
+            if (errorMessageElement) {
+                errorMessageElement.textContent = message;
+                errorMessageElement.style.display = 'block';
+            }
+        }
+    document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById('date');
+    const dateError = document.getElementById('dateError');
+    dateInput.addEventListener('blur', () => {
+        validateInput(dateInput, dateError, 'Please select a date.');
+    });
+
+    const categoryInput = document.getElementById('category');
+    const categoryError = document.getElementById('categoryError');
+    categoryInput.addEventListener('blur', () => {
+        validateSelect(categoryInput, categoryError, 'Please select a category.');
+    });
+
+    const plannedAmountInput = document.getElementById('plannedAmount');
+    const plannedAmountError = document.getElementById('plannedAmountError');
+    plannedAmountInput.addEventListener('blur', () => {
+        validateInput(plannedAmountInput, plannedAmountError, 'Please enter the planned amount.');
+    });
+
+    const actualAmountInput = document.getElementById('actualAmount');
+    const actualAmountError = document.getElementById('actualAmountError');
+    actualAmountInput.addEventListener('blur', () => {
+        validateInput(actualAmountInput, actualAmountError, 'Please enter the actual amount.');
+    });
+
+    function validateInput(inputElement, errorElement, errorMessage) {
+        if (inputElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function validateSelect(selectElement, errorElement, errorMessage) {
+        if (selectElement.value.trim() === "") {
+            showError(errorElement, errorMessage);
+        } else {
+            hideError(errorElement);
+        }
+    }
+
+    function showError(element, errorMessage) {
+        element.textContent = errorMessage;
+        element.style.color = "red";
+        element.style.display = "block";
+    }
+
+    function hideError(element) {
+        element.textContent = "";
+        element.style.display = "none";
+    }
+});
+
+</script>
+</body>
+</html>

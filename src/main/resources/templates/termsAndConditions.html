@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEO Dashboard Development - Terms and Conditions</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: rgb(226, 234, 237);
+        }
+        .horizontal-a4 {
+            width: calc(210mm - 40px); /* Adjusted width with left and right padding */
+            height: 520mm; 
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px; /* Added left and right padding */
+        }
+        .content {
+            font-family: Arial, sans-serif;
+            font-size: 16px; 
+            line-height: 1.6;
+            padding: 10px; 
+            text-align: justify;            
+            width: 100%; 
+        }
+        .ok-button {
+            margin-bottom: 20px;
+        }
+        .ok-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .ok-button button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="horizontal-a4">
+        <div class="content">
+            <h1 style="text-align: center;">Terms and Conditions</h1>
+
+            <h2>1. Acceptance of Terms</h2>
+            <p>1.1 By accessing, using, or contributing to the development of the Saranya Jash Corporation web application, you agree to comply with these Terms and Conditions. If you do not agree with any part of these Terms, you may not participate in the development process.</p>
+
+            <h2>2. Project Development</h2>
+            <p>2.1 The purpose of this document is to outline the tasks, requirements, and guidelines for the development of the Saranya Jash Corporation web application web application.</p>
+            <p>2.2 Scope: The Dashboard will provide a comprehensive overview of key performance indicators (KPIs), financial data, operational metrics, and other relevant insights to assist the CEO in making informed decisions.</p>
+
+            <h2>3. Intellectual Property</h2>
+            <p>3.1 All intellectual property rights, including but not limited to code, designs, graphics, and content developed for the Dashboard, remain the property of [Your Company Name].</p>
+            <p>3.2 Contributors retain ownership of their contributions but grant Saranya Jash Corporation a perpetual, irrevocable, worldwide, non-exclusive, royalty-free license to use, modify, distribute, and sublicense their contributions for the purpose of the Dashboard development.</p>
+
+            <h2>4. User Authentication and Authorization</h2>
+            <p>4.1 During the development phase, ensure the implementation of a secure user authentication and authorization system to protect access to the Dashboard.</p>
+
+            <h2>5. Compliance with Laws</h2>
+            <p>5.1 All contributors must comply with applicable laws, regulations, and industry standards during the development process, including but not limited to data protection laws and intellectual property rights.</p>
+
+            <h2>6. Code of Conduct</h2>
+            <p>6.1 Contributors are expected to conduct themselves professionally, respectfully, and ethically throughout the development process. Discrimination, harassment, or any form of inappropriate behavior will not be tolerated.</p>
+
+            <h2>7. Confidentiality</h2>
+            <p>7.1 All information, data, and materials shared during the development process, including but not limited to business strategies, technical specifications, and financial data, must be treated as confidential and not disclosed to unauthorized parties.</p>
+
+            <h2>8. Quality Assurance</h2>
+            <p>8.1 Contributions to the Dashboard must undergo thorough testing and quality assurance procedures to ensure functionality, performance, and security standards are met.</p>
+
+            <h2>9. Limitation of Liability</h2>
+            <p>9.1 Saranya Jash Corporation shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from the development, use, or inability to use the Dashboard, including but not limited to loss of profits, data, or business opportunities.</p>
+
+            <h2>10. Termination</h2>
+            <p>10.1 Saranya Jash Corporation reserves the right to terminate any contributor's participation in the development process if they violate these Terms, engage in misconduct, or pose a risk to the project's integrity.</p>
+
+            <h2>11. Governing Law</h2>
+            <p>11.1 These Terms and the development of the Dashboard shall be governed by and construed in accordance with the laws of [Your Jurisdiction], excluding its conflict of laws provisions.</p>
+
+            <p>By participating in the development of the CEO Dashboard web application, you acknowledge that you have read, understood, and agreed to abide by these Terms and Conditions.</p>
+
+            <p>Saranya Jash Corporation reserves the right to modify these Terms at any time with prior notice to contributors.</p>
+        </div>
+        <div class="ok-button">
+                <button id="okButton">OK</button>
+            </div>
+    </div>
+    <script>
+    document.getElementById("okButton").addEventListener("click", function() {
+        window.location.href = "/register";
+    });
+</script>
+</body>
+</html>

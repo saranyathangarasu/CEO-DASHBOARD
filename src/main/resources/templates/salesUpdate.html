@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE,edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Figures Update</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form {
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+        }
+        .form-input input {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px; 
+        }
+        .form-input select {
+            width: 100%;
+            padding: 8px;
+            width: 590px;
+            font-size: 14px; 
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <p>Sales Figures Update</p>
+        </div>
+        <ul>
+            <li>
+                <form method="get" th:action="@{/salesDashboard}">
+                    <button class="cancel-button" type="submit">Cancel</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+    <div class="form-container">
+        <div class="form">
+            <h1>Sales Figures Update</h1>
+            <form method="post" th:action="@{/salesUpdate}" th:object="${salesData}" onsubmit="return validateForm()" novalidate>
+                <div class="form-input">
+                    <label for="name">Name:</label>
+                    <input th:field="*{name}" type="text" id="name" name="name">
+                    <span class="error-message" id="nameError"></span>
+                </div>
+                <div class="form-input">
+                    <label for="email">Email:</label>
+                    <input th:field="*{email}" type="email" id="email" name="email">
+                    <span class="error-message" id="emailError"></span>
+                </div>
+                <div class="form-input">
+    				<label for="phone">Phone:</label>
+    				<div class="phone-input-wrapper">
+        				<input th:field="*{phone}" type="text" id="phone" name="phone" maxlength="10">
+    				</div>
+    				<span class="error-message" id="phoneError"></span>
+				</div>
+                <div class="form-input">
+                    <label for="company">Company:</label>
+                    <input th:field="*{company}" type="text" id="company" name="company">
+                    <span class="error-message" id="companyError"></span>
+                </div>
+                <div class="form-input">
+                    <label for="status">Status:</label>
+                    <select th:field="*{status}" id="status" name="status">
+                        <option value=""></option>
+                        <option value="contacted">Contacted</option>
+                        <option value="new">New</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                    <span class="error-message" id="statusError"></span>
+                </div>
+                <div class="center-button">
+                    <button class="update-button" type="submit">Add Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+    function fetchExistingData() {
+        fetch('/fetchExistingDataEndpoint')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                existingData = data;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Failed to fetch existing data. Please try again later.');
+            });
+    }
+    var existingData = []; 
+    fetchExistingData();
+    function validateForm() {
+            var nameInput = document.getElementById("name");
+            var emailInput = document.getElementById("email");
+            var phoneInput = document.getElementById("phone");
+            var companyInput = document.getElementById("company");
+            var statusInput = document.getElementById("status");
+            var isError = false;
+
+            if (!nameInput.value.trim()) {
+                setCustomValidityAndDisplayError(nameInput, "nameError", "Please enter a name.");
+                isError = true;
+            } else if (!isValidName(nameInput.value)) {
+                setCustomValidityAndDisplayError(nameInput, "nameError", "Please enter a correct name.");
+                isError = true;
+            } else if (isNameTaken(nameInput.value)) {
+                setCustomValidityAndDisplayError(nameInput, "nameError", "Name is already taken.");
+                isError = true;
+            } else {
+                hideError("nameError");
+            }
+
+            if (!emailInput.value.trim()) {
+                setCustomValidityAndDisplayError(emailInput, "emailError", "Please enter an email address.");
+                isError = true;
+            } else if (!isValidEmail(emailInput.value)) {
+                setCustomValidityAndDisplayError(emailInput, "emailError", "Please enter a valid email address.");
+                isError = true;
+            } else if (!isValidEmailFormat(emailInput.value)) {
+                setCustomValidityAndDisplayError(emailInput, "emailError", "Email must not start with a dot (.)");
+                isError = true;
+            } else if (isEmailTaken(emailInput.value.trim())) {
+                setCustomValidityAndDisplayError(emailInput, "emailError", "Email is already taken.");
+                isError = true;
+            } else {
+                hideError("emailError");
+            }
+
+            const phoneValue = phoneInput.value.replace(/\D/g, ""); 
+            if (!phoneValue) {
+                displayError("phoneError", "Please enter a phone number.");
+                isError = true;
+            } else if (phoneValue.length !== 10) {
+                displayError("phoneError", "Please enter a 10-digit phone number.");
+                isError = true;
+            } else if (!isValidPhoneNumber(phoneValue)) {
+                displayError("phoneError", "Please enter a valid phone number.");
+                isError = true;
+            } else {
+                hideError("phoneError");
+            }
+
+            if (!companyInput.value.trim()) {
+                setCustomValidityAndDisplayError(companyInput, "companyError", "Please enter a company name.");
+                isError = true;
+            } else if (!isValidCompany(companyInput.value.trim())) {
+                setCustomValidityAndDisplayError(companyInput, "companyError", "Please enter a correct company name .");
+                isError = true;
+            } else if (isCompanyTaken(companyInput.value.trim())) {
+                setCustomValidityAndDisplayError(companyInput, "companyError", "Company name is already taken.");
+                isError = true;
+            } else {
+                hideError("companyError");
+            }
+
+            if (!statusInput.value) {
+                displayError("statusError", "Please select a status.");
+                isError = true;
+            } else {
+                hideError("statusError");
+            }
+
+            return !isError;
+        }
+
+        function setCustomValidityAndDisplayError(inputElement, errorId, errorMessage) {
+            inputElement.setCustomValidity(errorMessage);
+            displayError(errorId, errorMessage);
+        }
+
+        function displayError(errorId, errorMessage) {
+            var errorElement = document.getElementById(errorId);
+            errorElement.innerHTML = errorMessage;
+            errorElement.style.display = "block";
+        }
+
+        function hideError(errorId) {
+            var errorElement = document.getElementById(errorId);
+            errorElement.innerHTML = "";
+            errorElement.style.display = "none";
+        }
+        
+        function isValidName(name) {
+            var nameRegex = /^[A-Z][a-z]*( [A-Z][a-z]*)?$/;
+            return nameRegex.test(name);
+        }
+
+        function isValidEmail(email) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidEmailFormat(email) {
+            return !email.startsWith(".");
+        }
+
+        function isValidString(str) {
+            return /^[a-zA-Z\s]+$/.test(str);
+        }
+
+        function isValidCompany(company) {
+            var specialChars = 0;
+            for (var i = 0; i < company.length; i++) {
+                if (!(/[a-zA-Z0-9\s]/.test(company[i]))) {
+                    specialChars++;
+                }
+                if (specialChars > 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function isValidPhoneNumber(phone) {
+            var phoneRegex = /^[6789]\d{9}$/; 
+            return phoneRegex.test(phone);
+        }
+
+        function isNameTaken(name) {
+            return existingData.includes(name);
+        }
+
+        function isEmailTaken(email) {
+            return existingData.includes(email);
+        }
+
+        function isCompanyTaken(company) {
+            return existingData.includes(company);
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const companyInput = document.getElementById('company');
+        const statusInput = document.getElementById('status');
+
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const phoneError = document.getElementById('phoneError');
+        const companyError = document.getElementById('companyError');
+        const statusError = document.getElementById('statusError');
+
+        nameInput.addEventListener('blur', () => {
+            validateInput(nameInput, nameError, 'Please enter a Name.');
+        });
+
+        emailInput.addEventListener('blur', () => {
+            validateInput(emailInput, emailError, 'Please enter an Email.');
+        });
+
+        phoneInput.addEventListener('blur', () => {
+            validateInput(phoneInput, phoneError, 'Please enter a Phone number.');
+        });
+
+        companyInput.addEventListener('blur', () => {
+            validateInput(companyInput, companyError, 'Please enter a Company name.');
+        });
+
+        statusInput.addEventListener('blur', () => {
+            validateInput(statusInput, statusError, 'Please select a Status.');
+        });
+    });
+
+    function validateInput(inputElement, errorElement, errorMessage) {
+        if (!inputElement.value.trim()) {
+            errorElement.innerHTML = errorMessage;
+            errorElement.style.display = "block";
+        } else {
+            errorElement.innerHTML = "";
+            errorElement.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

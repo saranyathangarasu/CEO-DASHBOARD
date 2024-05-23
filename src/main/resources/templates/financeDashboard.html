@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>financeDashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+            color: black;
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+        .menu-toggle i {
+            font-size: 24px;
+            color: black;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0; 
+            position: fixed;
+            z-index: 1;
+            top: 75px;
+            left: 0;
+            background-color: #0056b3;
+            padding-top: 20px;
+            transition: width 0.3s ease; 
+            overflow: hidden; 
+        }
+
+        .sidenav.active {
+            width: 250px; 
+        }
+
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidenav a:hover {
+            background-color: #c5c509;
+        }
+
+        .logout-button-sidenav {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            width: 250px;
+            text-align: center;
+        }
+
+        .logout-button-sidenav:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+            flex-grow: 1;
+            text-align: center; 
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        button {
+          	background-color:rgb(205, 50, 107) ;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color:rgb(205, 50, 107);
+        }
+        table {
+            position: relative;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .financial-con {
+            margin-top: 80px;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .chart-container {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: #f4ede6;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .chart-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+        }
+        .chart-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 20px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .fa-solid.fa-bars {
+            font-size: 24px;
+            color: rgb(255, 255, 255);
+            margin-right: 30px;
+            margin-left: 30px;
+        }
+        @media only screen and (max-width: 768px) {
+            .sidenav {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease; 
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .menu-toggle.active {
+                color: red; 
+            }
+
+            .sidenav.active {
+                width: 250px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <i class="fa-solid fa-bars menu-toggle"></i> 
+                <p>Finance Dashboard</p>
+            </div>
+        </nav>
+        <div class="sidenav">           
+            <a href="/financeUpdate">Add Data</a>
+            <a href="/salesOverview">Sales & Marketing Overview</a>
+            <a href="/financeBudgeting">Finance Budgeting Dashboard</a>
+            <a href="/profile">View Profile</a>
+            <a href="/chatRoom1">chat Room</a>
+            <button class="logout-button-sidenav" id="logoutButton">Logout</button>
+        </div>
+        
+        <div class="financial-con">
+            <h1 class="h1">Financial Data</h1>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Revenue</th>
+                            <th>Expenses</th>
+                            <th>Current Assets</th>
+                            <th>Current Liabilities</th>
+                            <th>Total Liabilities</th>
+                            <th>Shareholders' Equity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="financeData : ${financeDataList}">
+                            <td th:text="${#dates.format(financeData.date, 'dd-MM-yyyy')}"></td>
+                            <td th:text="${financeData.revenue}"></td>
+                            <td th:text="${financeData.expenses}"></td>
+                            <td th:text="${financeData.currentAssets}"></td>
+                            <td th:text="${financeData.currentLiabilities}"></td>
+                            <td th:text="${financeData.currentLiabilities}"></td>
+                            <td th:text="${financeData.getEquity()}"></td>
+                            <td>
+                                <button class="button" style="background-color: #008000;" th:onclick="'updateFinanceData(\'' + ${financeData.id} + '\')'">Edit</button>
+                                <button class="button" th:onclick="'deleteFinanceData(\'' + ${financeData.id} + '\')'">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="ratio-con">
+            <h1 class="h1">Financial Ratios</h1>
+            <div>
+                <table id="ratiosTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Net Profit Margin</th>
+                            <th>Current Ratio</th>
+                            <th>Debt to Equity Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ratio : ${financialRatios}">
+                            <td th:text="${#dates.format(ratio.date, 'dd-MM-yyyy')}"></td>
+                            <td data-type="percentage" th:if="${ratio.netProfitMargin != null}"
+                                th:text="${#numbers.formatDecimal(ratio.netProfitMargin , 2, 2)}"></td>
+                            <td data-type="percentage" th:if="${ratio.currentRatio != null}"
+                                th:text="${#numbers.formatDecimal(ratio.currentRatio , 2, 2)}"></td>
+                            <td data-type="percentage" th:if="${ratio.debtToEquityRatio != null}"
+                                th:text="${#numbers.formatDecimal(ratio.debtToEquityRatio , 2, 2)}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="chart-row">
+            <div class="chart-container">
+                <canvas id="netProfitMarginChart" width="800" height="400"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="currentRatioChart" width="800" height="400"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="debtToEquityRatioChart" width="800" height="400"></canvas>
+            </div>
+        </div>
+        <div>
+            <th:block th:if="${#authorization.expression('hasAuthority(''HO_Company'')')}">
+                <div id="backToDashboardButton">
+                    <a th:href="@{/home}">
+                        <button>Back To Dashboard</button>
+                    </a>
+                </div>
+            </th:block>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuToggle = document.querySelector(".menu-toggle");
+            const sideNav = document.querySelector(".sidenav");
+
+            menuToggle.addEventListener("click", function () {
+                sideNav.classList.toggle("active");
+                menuToggle.classList.toggle("active");
+            });
+
+            const dropdown = document.querySelector(".dropdown");
+
+            dropdown.addEventListener("click", function () {
+                dropdown.classList.toggle("active");
+            });
+        });
+        document.getElementById("logoutButton").addEventListener("click", function () {
+        window.location.href = "/login";
+    });
+    </script>
+    <script>
+		 function deleteFinanceData(id) {
+        if (isNaN(id)) {
+            console.error('Invalid id:', id);
+            alert("Invalid ID. Please try again.");
+            return;
+        }
+        id = parseInt(id);
+        if (confirm("Are you sure you want to delete this entry?")) {
+            fetch(`/financeDelete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Entry deleted successfully");
+                        window.location.reload();
+                    } else {
+                        throw new Error('Failed to delete entry');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to delete entry");
+                });
+        }
+    }
+    function updateFinanceData(id) {
+        window.location.href = "/financeEdit/" + id;
+    }
+	document.getElementById("overviewButton").addEventListener("click", function () {
+        window.location.href = "/salesOverview";
+    });
+    document.getElementById("budgetingButton").addEventListener("click", function () {
+        window.location.href = "/financeBudgeting";
+    });
+    document.getElementById("updateButton").addEventListener("click", function () {
+        this.disabled = true;
+        window.location.href = "/financeUpdate";
+    });
+    document.getElementById("logoutButton").addEventListener("click", function () {
+        this.disabled = true;
+        window.location.href = "/login";
+    });
+	</script>
+    <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchNetProfitMarginData("/netProfitMarginData", "netProfitMarginChart");
+        fetchCurrentRatioData("/currentRatioData", "currentRatioChart");
+    });
+    function fetchNetProfitMarginData(apiUrl, chartId) {
+        fetchChartData(apiUrl, chartId, createNetProfitMarginChart);
+    }
+    function fetchCurrentRatioData(apiUrl, chartId) {
+        fetchChartData(apiUrl, chartId, createCurrentRatioChart);
+    }
+    function fetchChartData(apiUrl, chartId, createChartFunction) {
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Creating chart ${chartId} with data:`, data);
+                createChartFunction(chartId, data);
+            })
+            .catch(error => {
+                console.error(`Error fetching or processing data for ${chartId}:`, error);
+            });
+    }
+    function createNetProfitMarginChart(chartId, data) {
+        try {
+            var labels = [];
+            var values = [];
+            data.forEach(item => {
+                if (item.date && item.netProfitMargin !== null) {
+                    labels.push(item.date);
+                    values.push(item.netProfitMargin);
+                }
+            });
+            var ctx = document.getElementById(chartId).getContext('2d');
+            if (window[chartId] instanceof Chart) {
+                window[chartId].destroy();
+            }
+            window[chartId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Net Profit Margin',
+                        data: values,
+                        backgroundColor: '#17a2b8',
+                    borderColor: '#17a2b8',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating Net Profit Margin chart:', error);
+        }
+    }
+    function createCurrentRatioChart(chartId, data) {
+        try {
+            var labels = [];
+            var values = [];
+            data.forEach(item => {
+                if (item.date && item.currentRatio !== null) {
+                    labels.push(item.date);
+                    values.push(item.currentRatio);
+                }
+            });
+            var ctx = document.getElementById(chartId).getContext('2d');
+            if (window[chartId] instanceof Chart) {
+                window[chartId].destroy(); 
+            }
+            window[chartId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Current Ratio',
+                        data: values,
+                        backgroundColor: '#007bff',
+                    borderColor: '#007bff',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating Current Ratio chart:', error);
+        }
+    }
+</script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchDebtToEquityRatioData("/debtToEquityRatioData", "debtToEquityRatioChart");
+    });
+    function fetchDebtToEquityRatioData(apiUrl, chartId) {
+        fetchChartData(apiUrl, chartId, createDebtToEquityRatioChart);
+    }
+    function createDebtToEquityRatioChart(chartId, data) {
+        try {
+            var labels = [];
+            var values = [];
+            data.forEach(item => {
+                if (item.date && item.debtToEquityRatio !== null) {
+                    labels.push(item.date);
+                    values.push(item.debtToEquityRatio);
+                }
+            });
+            var ctx = document.getElementById(chartId).getContext('2d');
+            if (window[chartId] instanceof Chart) {
+                window[chartId].destroy(); 
+            }
+            window[chartId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Debt to Equity Ratio',
+                        data: values,
+                        borderColor:'#28a745', 
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating Debt to Equity Ratio chart:', error);
+        }
+    }
+</script>
+</body>
+</html>

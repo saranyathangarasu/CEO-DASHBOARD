@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Profile</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(226, 234, 237);
+}
+
+nav {
+  width: 100%;
+  height: 75px;
+  line-height: 75px;
+  position: fixed;
+  top: 0px;
+  z-index: 9999;
+  background-color: #007bff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.logo p {
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.container {
+  display: block;
+  max-width: 800px;
+  margin: 100px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  align-items: center;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+form {
+  background: #f0f0f0;
+  display: grid;
+  gap: 20px; 
+  padding: 20px; 
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px; 
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px; 
+}
+
+input[type="text"],
+input[type="email"] {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: calc(100% - 20px);
+}
+button {
+  padding: 8px 16px;
+  text-align: center;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  background-color: rgb(205, 50, 107);
+  color: #fff;
+  cursor: pointer;
+  margin: 20px auto 0; 
+  display: block; 
+}
+
+button:hover {
+  background-color: rgb(205, 50, 107);
+}
+.cancel-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-left: 20px;
+        }
+        .cancel-button:hover {
+            text-decoration: underline;
+        }
+#maritalStatus,
+#gender,
+#degree {
+  width: calc(100% - 5px); 
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+#dob {
+  width: calc(100% - 5px); 
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+</style>
+</head>
+<body style="background-color: rgb(226, 234, 237);">
+  <nav>
+      <div class="logo">
+          <p>SARANYA JASH CORPORATION</p>
+      </div>
+      <div class="button-con">
+          <ul>
+              <button class="cancel-button" id="cancelButton">Cancel</button>
+          </ul>
+      </div>
+  </nav>
+<div class="container">
+  <h1>Profile Settings</h1>
+    <form th:action="@{/profile/save}" th:object="${user}" method="post" id="register-form">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{password}" />
+            <input type="hidden" th:field="*{roles}" th:value="${user.roles}" />
+      <div class="form-row">
+        <div class="input-group">
+          <label class="form-label"><b>User Name</b></label>
+          <input type="hidden" class="form-control mb-1" th:field="*{username}">
+          <p th:text="${user.username}" class="form-control-static"></p>
+        </div>
+        <div class="input-group">
+          <label class="form-label"><b>Email</b></label>
+          <input type="hidden" class="form-control mb-1" th:field="*{email}">
+          <p th:text="${user.email}" class="form-control-static"></p>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="input-group">
+          <label for="firstname" class="form-label"><b>First Name</b></label>
+    			<input type="text" id="firstname" class="form-control" placeholder="Enter First Name" th:field="*{firstname}" required autofocus>
+    			<span id="firstname-error" class="error-message" style="color: red;"></span>
+        </div>
+        <div class="input-group">
+          <label for="username1" class="form-label"><b>Last Name</b></label>
+          <input type="text" id="username1" class="form-control" placeholder="Enter Last Name" th:field="*{username1}" required autofocus>
+          <span id="username1-error" class="error-message" style="color: red;"></span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="input-group">
+          <label for="dob" class="form-label"><b>Date Of Birth</b></label>
+          <input type="date" id="dob" class="form-control" th:field="*{dob}" required>
+          <span id="dob-error" class="error-message" style="color: red;"></span>
+        </div>
+        <div class="input-group">
+          <label class="form-label"><b>Phone</b></label>
+          <input type="text" class="form-control" th:field="*{phone}">
+          <span id="phone-error" class="error-message" style="color: red;"></span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="input-group">
+          <label for="maritalStatus" class="form-label"><b>Marital Status</b></label>
+          <select id="maritalStatus" class="form-control" required th:field="*{maritalStatus}">
+            <option value="" selected>Select Marital Status</option>
+            <option value="Married">Married</option>
+            <option value="Unmarried">Unmarried</option>
+          </select>
+        <span id="maritalStatus-error" class="error-message" style="color: red;"></span>
+        </div>
+        <div class="input-group">
+          <label for="gender" class="form-label"><b>Gender</b></label>
+          <select id="gender" class="form-control" required th:field="*{gender}">
+            <option value="" selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Others">Others</option>
+          </select>
+          <span id="gender-error" class="error-message" style="color: red;"></span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="input-group">
+          <label for="degree" class="form-label"><b>Degree</b></label>
+    			<select id="degree" class="form-control" required th:field="*{degree}" onchange="checkOtherDegree(this)">
+        			<option value="" selected>Select Degree</option>
+        			<option value="B.E">B.E</option>
+        			<option value="MBA">MBA</option>
+        			<option value="B.Tech">B.Tech</option>
+        			<option value="B.Sc">B.Sc</option>
+        			<option value="Others">Others</option>
+    			</select>
+    			<input type="text" id="otherDegree" class="form-control mt-2" placeholder="Enter Degree" name="otherDegree" style="display: none;">
+    			<span id="degree-error" class="error-message" style="color: red;"></span>
+        </div>
+        <div class="input-group">
+          <label for="department" class="form-label" th:field="*{department}" ><b>Department</b></label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="financialMetrics" th:id="${'financialMetrics'}" name="department" th:value="'Financial Metrics'" th:checked="${user.department == 'Financial Metrics'}">
+                <label class="form-check-label" for="financialMetrics">Financial Metrics</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="salesAndMarketing" th:id="${'salesAndMarketing'}" name="department" th:value="'Sales and Marketing'" th:checked="${user.department == 'Sales and Marketing'}">
+                <label class="form-check-label" for="salesAndMarketing">Sales and Marketing</label>
+              </div>                                    
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="operationalMetrics" th:id="${'operationalMetrics'}" name="department" th:value="'Operational Metrics'" th:checked="${user.department == 'Operational Metrics'}">
+                <label class="form-check-label" for="operationalMetrics">Operational Metrics</label>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="input-group">
+          <label for="address" class="form-label"><b>Address</b></label>
+          <input type="text" id="address" class="form-control" placeholder="Enter Address" th:field="*{address}" required autofocus>
+          <span id="address-error" class="error-message" style="color: red;"></span>
+        </div>
+      </div>
+    </form>
+    <button type="submit" id="saveButton">Update Profile</button>
+    <script>
+         $(document).ready(function () {
+    // Submit form via AJAX
+    $("#saveButton").click(function (event) {
+        event.preventDefault(); // Prevent default form submission
+        var formData = $("#register-form").serialize(); // Serialize form data
+
+        $.ajax({
+            type: "POST",
+            url: "/profile/save",
+            data: formData,
+            success: function (response) {
+                // Handle success response
+                window.location.href = "/profile";
+            },
+            error: function (xhr, status, error) {
+                // Handle error response
+                console.error('Error:', error);
+                alert("Failed to update profile: " + xhr.responseText);
+            }
+        });
+    });
+
+    // Cancel button click event
+    $("#cancelButton").click(function (event) {
+        event.preventDefault();
+        window.location.href = "/home";
+    });
+
+    // Toggle other degree input
+    function toggleOtherDegreeInput() {
+        var degreeSelect = document.getElementById('degree');
+        var otherDegreeInput = document.getElementById('otherDegree');
+        if (degreeSelect.value === 'Others') {
+            otherDegreeInput.style.display = 'block';
+        } else {
+            otherDegreeInput.style.display = 'none';
+            otherDegreeInput.value = '';
+        }
+    }
+
+    toggleOtherDegreeInput(); // Initial call
+
+    // Event listener for degree select change
+    document.getElementById('degree').addEventListener('change', function () {
+        toggleOtherDegreeInput();
+    });
+});
+
+    </script>
+<script type="text/javascript">
+var lastCharTyped = '';
+document.getElementById('firstname').addEventListener('input', function(event) {
+    var firstnameInput = this.value.trim();
+    var errorElement = document.getElementById('firstname-error');
+    errorElement.textContent = '';
+    if (!/^[A-Za-z ]*$/.test(firstnameInput)) {
+        this.value = this.value.replace(/[^A-Za-z ]/g, ''); 
+        errorElement.textContent = 'Only alphabetic characters and one space are allowed in the First Name field.';
+        return;
+    }
+    if (lastCharTyped === ' ' && event.data === ' ') {
+        lastCharTyped = ''; 
+        return;
+    }
+    lastCharTyped = event.data; 
+    if (firstnameInput.length > 19) {
+        this.value = this.value.slice(0, 19);
+        errorElement.textContent = 'Only 19 characters are allowed in the First Name field.';
+        return;
+    }
+    this.value = firstnameInput.charAt(0).toUpperCase() + firstnameInput.slice(1); 
+    errorElement.textContent = '';
+});
+document.getElementById('register-form').addEventListener('submit', function(event) {
+    var firstnameInput = document.getElementById('firstname').value.trim();
+    var errorElement = document.getElementById('firstname-error');
+    errorElement.textContent = '';
+    if (!/^[A-Za-z ]*$/.test(firstnameInput)) {
+        errorElement.textContent = 'Only alphabetic characters and one space are allowed in the First Name field.';
+        event.preventDefault();
+        return;
+    }
+    if (firstnameInput.length < 5 || firstnameInput.length > 19) {
+        errorElement.textContent = 'First Name must be between 5 and 19 characters.';
+        event.preventDefault();
+        return;
+    }
+    this.value = firstnameInput.charAt(0).toUpperCase() + firstnameInput.slice(1); 
+    errorElement.textContent = '';
+});
+</script>
+<script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var lastCharTypedUsername1 = '';
+            document.getElementById('username1').addEventListener('input', function (event) {
+                var username1Input = this.value.trim();
+                var errorElement = document.getElementById('username1-error');
+                errorElement.textContent = '';
+                if (!/^[A-Za-z\s]*$/.test(username1Input)) {
+                    this.value = lastCharTypedUsername1; 
+                    errorElement.textContent = 'Only alphabetic characters and spaces are allowed in the Last Name field.';
+                    return;
+                }
+                lastCharTypedUsername1 = username1Input;
+                if (username1Input.length > 19) {
+                    this.value = username1Input.slice(0, 19); 
+                    errorElement.textContent = 'Only 19 characters are allowed in the Last Name field.';
+                    return;
+                }
+                this.value = username1Input.charAt(0).toUpperCase() + username1Input.slice(1); 
+                errorElement.textContent = ''; 
+            });
+            document.getElementById('register-form').addEventListener('submit', function (event) {
+                var username1Input = document.getElementById('username1').value.trim();
+                var errorElement = document.getElementById('username1-error');
+                errorElement.textContent = '';
+                if (!/^[A-Za-z\s]*$/.test(username1Input)) {
+                    errorElement.textContent = 'Only alphabetic characters and spaces are allowed in the Last Name field.';
+                    event.preventDefault(); 
+                    return;
+                }
+                if (username1Input.length < 5 || username1Input.length > 19) {
+                    errorElement.textContent = 'Last Name must be between 5 and 19 characters.';
+                    event.preventDefault(); 
+                    return;
+                }
+                document.getElementById('username1').value = username1Input.charAt(0).toUpperCase() + username1Input.slice(1); // Capitalize first letter
+                errorElement.textContent = ''; 
+            });
+        });
+        
+    </script>
+<script>
+	document.getElementById("register-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var isValid = true;
+            var firstNameInput = document.getElementById("firstname");
+            var firstNameError = document.getElementById("firstname-error");
+            if (firstNameInput.value.trim() === "") {
+                firstNameError.textContent = "Please fill in the First Name.";
+                isValid = false;
+            } else {
+                firstNameError.textContent = "";
+            }
+            var username1Input = document.getElementById("username1");
+            var username1Error = document.getElementById("username1-error");
+            if (username1Input.value.trim() === "") {
+                username1Error.textContent = "Please fill in the Last Name.";
+                isValid = false;
+            } else {
+                username1Error.textContent = "";
+            }
+            var phoneInput = document.getElementById("phone");
+            var phoneError = document.getElementById("phone-error");
+            if (phoneInput.value.trim() === "") {
+                phoneError.textContent = "Please fill in the Phone Number.";
+                isValid = false;
+            } else {
+                phoneError.textContent = "";
+            }
+            if (isValid) {
+                this.submit();
+            }
+    });
+    const firstnameInput = document.getElementById('firstname');
+const firstnameError = document.getElementById('firstname-error');
+firstnameInput.addEventListener('blur', (event) => {
+    const firstname = event.target.value;
+    firstnameError.textContent = '';
+    if (firstname === '') {
+        firstnameError.textContent = 'First Name cannot be empty.'; 
+    }
+});
+    const username1Input = document.getElementById('username1');
+    const username1Error = document.getElementById('username1-error');
+    username1Input.addEventListener('blur', (event) => {
+      const username1 = event.target.value;
+      username1Error.textContent = ''; 
+      if (username1 === '') {
+        username1Error.textContent = 'Last Name cannot be empty.';
+      } 
+    });
+    const genderInput = document.getElementById('gender');
+    const genderError = document.getElementById('gender-error');
+    genderInput.addEventListener('blur', (event) => {
+      const gender = event.target.value;
+      genderError.textContent = ''; 
+      if (gender === '') {
+        genderError.textContent = 'Gender cannot be empty.';
+      } 
+    });
+    const phoneInput = document.getElementById('phone');
+    const phoneError = document.getElementById('phone-error');
+    phoneInput.addEventListener('blur', (event) => {
+      const phone = event.target.value;
+      phoneError.textContent = ''; 
+      if (phone === '') {
+        phoneError.textContent = 'Phone cannot be empty.';
+      } 
+    });
+    const dobInput = document.getElementById('dob');
+    const dobError = document.getElementById('dob-error');
+    dobInput.addEventListener('blur', (event) => {
+      const dob = event.target.value;
+      dobError.textContent = ''; 
+      if (dob === '') {
+        dobError.textContent = 'Date Of Birth cannot be empty.';
+      } 
+    });
+    const addressInput = document.getElementById('address');
+    const addressError = document.getElementById('address-error');
+    dobInput.addEventListener('blur', (event) => {
+      const address = event.target.value;
+      addressError.textContent = ''; 
+      if (address === '') {
+        addressError.textContent = 'Address cannot be empty.';
+      } 
+    });
+    const maritalStatusInput = document.getElementById('maritalStatus');
+    const maritalStatusError = document.getElementById('maritalStatus-error');
+    maritalStatusInput.addEventListener('blur', (event) => {
+      const maritalStatus = event.target.value;
+      maritalStatusError.textContent = ''; 
+      if (maritalStatus === '') {
+        maritalStatusError.textContent = 'Marital Status cannot be empty.';
+      } 
+    });
+    const degreeInput = document.getElementById('degree');
+    const degreeError = document.getElementById('degree-error');
+    degreeInput.addEventListener('blur', (event) => {
+      const degree = event.target.value;
+      degreeError.textContent = ''; 
+      if (degree === '') {
+        degreeError.textContent = 'Degree cannot be empty.';
+      } 
+    });
+document.getElementById("register-form").addEventListener("submit", function (event) {
+    var isValid = true;
+var phoneInput = document.getElementById("phone");
+    var phone = phoneInput.value.trim();
+    var phoneError = document.getElementById("phone-error");
+    phoneError.textContent = "";
+    phone = phone.replace(/\D/g, "");
+    if (phone === "") {
+        phoneError.textContent = "Please fill in the phone number.";
+        event.preventDefault();
+    } else if (!/^[6-9]\d{9}$/.test(phone)) {
+        phoneError.textContent = "Please enter a valid 10-digit phone number.";
+        event.preventDefault();
+    }
+var addressInput = document.getElementById('address');
+    var address = addressInput.value.trim();
+    var addressError = document.getElementById('address-error');
+    addressError.textContent = '';
+    if (address === '') {
+        addressError.textContent = 'Please fill in the Address.';
+        isValid = false;
+    } else if (/^\d{20,}$/.test(address) || /^[^\w\s]{5,}$/.test(address) || /^[1@]+$/.test(address)) {
+        addressError.textContent = 'Please enter a valid address.';
+        isValid = false;
+    }
+    var selectedDegree = document.getElementById('degree').value;
+    var otherDegreeInput = document.getElementById('otherDegree');
+    var otherDegreeValue = otherDegreeInput.value.trim();
+    var degreeError = document.getElementById('degree-error');
+    degreeError.textContent = '';
+
+    if (selectedDegree === '') {
+        degreeError.textContent = 'Please select a Degree.';
+        isValid = false;
+    } else if (selectedDegree === 'Others' && otherDegreeValue === '') {
+        degreeError.textContent = 'Please fill in the Other Degree field.';
+        isValid = false;
+    }
+var dobInput = document.getElementById("dob");
+    var dob = dobInput.value.trim();
+    var dobError = document.getElementById("dob-error");
+    dobError.textContent = '';
+    if (dob === '') {
+        dobError.textContent = 'Please fill in the Date of Birth.';
+        isValid = false;
+    } 
+    if (!isValid) {
+        event.preventDefault();
+    }
+});
+document.getElementById("phone").addEventListener("input", function (event) {
+    var inputValue = event.target.value.trim();
+    var phoneError = document.getElementById("phone-error");
+    phoneError.textContent = "";
+    inputValue = inputValue.replace(/\D/g, "");
+    if (inputValue.length > 10) {
+        inputValue = inputValue.slice(0, 10);
+    }
+    event.target.value = inputValue;
+});
+document.getElementById("phone").addEventListener("keydown", function (event) {
+    var inputValue = event.target.value.trim();
+    if (inputValue.replace(/\D/g, "").length >= 10 && event.key !== "Backspace" && event.key !== "Delete") {
+        event.preventDefault();
+    }
+});
+document.addEventListener("DOMContentLoaded", function() {
+    var dobInput = document.getElementById("dob");
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var currentMonth = ("0" + (currentDate.getMonth() + 1)).slice(-2); 
+    var currentDay = ("0" + currentDate.getDate()).slice(-2);
+
+    var maxDate = (currentYear - 18) + "-" + currentMonth + "-" + currentDay;
+    dobInput.max = maxDate;
+});
+</script>
+</body>
+</html>

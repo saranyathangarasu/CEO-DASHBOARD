@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>revenueDetails</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(226, 234, 237);
+        }
+        .bg-con {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        nav {
+            width: 100%;
+            height: 75px;
+            line-height: 75px;
+            position: fixed;
+            top: 0px;
+            z-index: 9999;
+            background-color: #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo p {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin: 0;
+        }
+        ul {
+            float: right;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .logout-button {
+            background: red;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .logout-button:hover {
+            text-decoration: underline;
+        }
+        .update-button {
+            background: green;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+        .update-button:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            margin-top: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .form {
+            margin-top: 40px;
+            background: #f0f0f0;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            text-align: center;
+        }
+        .rates-con {
+            padding-top: 10px;
+            margin-top: -20px;
+        }
+        .form-input {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .transparent-button {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+        }
+        .transparent-button:hover {
+            text-decoration: underline;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .h1 {
+            color: red;
+            text-align: center;
+            font-size: 50px;
+        }
+        #revenueChart {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color:rgb(205, 50, 107) ;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color:rgb(205, 50, 107) ;
+        }
+        #revenueContainer {
+            text-align: center; 
+            margin-top: 20px;
+        }
+        #backToDashboardButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-con">
+        <nav>
+            <div class="logo">
+                <p>Revenue Details</p>
+            </div>
+            <div class="button">
+                <ul>
+                    <li><button class="logout-button" id="cancelButton">Cancel</button></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="form-container">
+            <div class="form">
+                <h1>Revenue Details</h1>
+                <form id="revenueForm" action="/api/revenue/fetch" method="get">
+                    <div class="form-input">
+                        <label for="fromDate">From Date:</label>
+                        <input type="date" id="fromDate" name="fromDate" max="">
+                        <span class="error-message" id="fromDateError"></span>
+                    </div>
+                    <div class="form-input">
+                        <label for="toDate">To Date:</label>
+                        <input type="date" id="toDate" name="toDate" max="">
+                        <span class="error-message" id="toDateError"></span>
+                    </div>
+                    <div class="center-button">
+                        <button class="update-button" type="submit">Show Revenue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="revenueContainer"></div> 
+        <div class="h1">Revenue Chart</div>
+        <div>
+            <canvas id="revenueChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+    <div id="revenueContainer"></div> <!-- Add this line -->
+    <div>
+        <th:block th:if="${#authorization.expression('hasAnyAuthority(''HO_Company'',''Saleshead'',''Figureshead'')')}">
+            <div id="backToDashboardButton">
+                <a th:href="@{/figures}">
+                    <button>Back To Dashboard</button>
+                </a>
+            </div>
+        </th:block>
+    </div>
+    <a th:href="@{/api/revenue/download?fromDate=${fromDate}&toDate=${toDate}}" download>
+        <button id="downloadReportButton">Download Report</button>
+    </a>
+    <script>
+        $(document).ready(function () {
+            $('#revenueForm').submit(function (event) {
+                event.preventDefault();
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                $.get('/api/revenue', { startDate: fromDate, endDate: toDate })
+                    .done(function (response) {
+                        var totalRevenue = parseFloat(response).toFixed(2);
+                        $('#revenueContainer').html('<h2>Total Revenue: ' + totalRevenue + '</h2>');
+                        $('#revenueContainer').append('<a href="/api/revenue/download" download><button id="downloadReportButton">Download Report</button></a>');
+                    })
+                    .fail(function (error) {
+                        console.error('Error fetching data:', error);
+                        $('#revenueContainer').html('<h2></h2>');
+                    });
+            });
+            $(document).on('click', '#downloadReportButton', function () {
+            });
+        });
+        document.getElementById("cancelButton").addEventListener("click", function () {
+            window.location.href = "/figures";
+        });
+        document.addEventListener("DOMContentLoaded", async function () {
+            fetch("/api/figures")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Revenue Data:', data);
+                    const monthlyRevenueData = groupRevenueByMonth(data.revenueData);
+                    createRevenueChart(monthlyRevenueData);
+                })
+                .catch(error => {
+                    console.error("Error fetching revenue data:", error.message);
+                });
+            function groupRevenueByMonth(revenueData) {
+                const monthlyRevenueData = {};
+                revenueData.forEach(entry => {
+                    const date = new Date(entry[0]);
+                    const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+                    if (!monthlyRevenueData[monthYear]) {
+                        monthlyRevenueData[monthYear] = 0;
+                    }
+                    monthlyRevenueData[monthYear] += entry[1];
+                });
+                return monthlyRevenueData;
+            }
+            function createRevenueChart(monthlyRevenueData) {
+                const dates = Object.keys(monthlyRevenueData);
+                const revenues = Object.values(monthlyRevenueData);
+                const chartData = {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenues,
+                        fill: false,
+                        backgroundColor:[
+             
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)','#28a745',
+            '#dc3545' 
+        ],
+                    borderColor: [
+             
+            '#ffc107', 
+            '#007bff', 
+            'rgba(0, 128, 128, 1)', '#28a745',
+            '#dc3545'
+        ],
+                        tension: 0.1
+                    }]
+                };
+                const ctx = document.getElementById('revenueChart').getContext('2d'); 
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        });
+		
+    </script>
+<script>
+        $(document).ready(function () {
+            $('#revenueForm').submit(function (event) {
+                event.preventDefault();
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                var fromDateError = $('#fromDateError');
+                var toDateError = $('#toDateError');
+
+                if (!fromDate && !toDate) {
+                    fromDateError.text('Please fill the From Date').show();
+                    toDateError.text('Please fill the To Date').show();
+                    return;
+                } else {
+                    fromDateError.text('').hide();
+                    toDateError.text('').hide();
+                }
+
+                if (!fromDate) {
+                    fromDateError.text('Please fill the From Date').show();
+                    return;
+                } else {
+                    fromDateError.text('').hide();
+                }
+
+                if (!toDate) {
+                    toDateError.text('Please fill the To Date').show();
+                    return;
+                } else {
+                    toDateError.text('').hide();
+                }
+                $.get('/api/revenue', { startDate: fromDate, endDate: toDate })
+                    .done(function (response) {
+                        var totalRevenue = parseFloat(response).toFixed(2);
+                        $('#revenueContainer').html('<h2>Total Revenue: ' + totalRevenue + '</h2>');
+                        $('#revenueContainer').append('<a href="/api/revenue/download" download><button id="downloadReportButton">Download Report</button></a>');
+                    });
+            });
+            $(document).on('click', '#downloadReportButton', function () {
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                var downloadUrl = '/api/revenue/download?fromDate=' + fromDate + '&toDate=' + toDate;
+                downloadExcelSheet(downloadUrl);
+            });
+            function downloadExcelSheet(downloadUrl) {
+                var downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrl;
+                downloadLink.download = 'revenue_report.xlsx'; 
+                downloadLink.target = '_blank';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+            document.getElementById("cancelButton").addEventListener("click", function () {
+                window.location.href = "/figures";
+            });
+        });
+    </script>
+<script>
+        $(document).ready(function () {
+            var shouldHideButton = true;
+            if (shouldHideButton) {
+                $('#downloadReportButton').hide(); 
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var today = new Date().toISOString().split('T')[0];
+            $('#fromDate').attr('max', today);
+            $('#toDate').attr('max', today);
+        });       
+    </script>
+</body>
+</html>
